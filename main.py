@@ -13,6 +13,35 @@ class Shell():
         return self.left_rect,self.top_rect
 
 
+class Step():
+    def __init__(self,x,y,color):
+        self.color = color
+        self.x_1 = x
+        self.y_1 = y
+        self.side_cube = 30
+        self.x_2 = x + self.side_cube
+        self.y_2 = y
+        self.x_3 = x + self.side_cube
+        self.y_3 = y + self.side_cube
+        self.x_4 = x + self.side_cube*2
+        self.y_4 = y + self.side_cube
+    def show(self):
+        pygame.draw.rect(SCREEN,self.color,
+                         (self.x_1, self.y_1, self.side_cube, self.side_cube))
+        pygame.draw.rect(SCREEN,self.color,
+                         (self.x_2, self.y_2, self.side_cube, self.side_cube))
+        pygame.draw.rect(SCREEN,self.color,
+                         (self.x_3, self.y_3, self.side_cube, self.side_cube))
+        pygame.draw.rect(SCREEN,self.color,
+                         (self.x_4, self.y_4, self.side_cube, self.side_cube))
+    def move(self):
+        self.y_1 += 4
+        self.y_2 += 4
+        self.y_3 += 4
+        self.y_4 += 4
+        if pygame.event.peek(pygame.KEYDOWN):
+            print('ENN')
+        
 
 
 pygame.init()
@@ -22,10 +51,14 @@ HEIGHT = 1000
 SCREEN = pygame.display.set_mode((WIDTH,HEIGHT))   
 RUN_GAME = True
 CLOCK = pygame.time.Clock()
+objec = Step(100,100,(174,122,14))
 
 while RUN_GAME:
+    SCREEN.fill((255,255,255))
     CLOCK.tick(20)
     pygame.event.pump()
+    objec.show()
+    objec.move()
     if pygame.event.peek(pygame.QUIT):
         RUN_GAME = False
     pygame.display.update()
