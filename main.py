@@ -40,7 +40,22 @@ class Step():
         self.y_3 += 4
         self.y_4 += 4
         if pygame.event.peek(pygame.KEYDOWN):
-            print('ENN')
+            for event in pygame.event.get(eventtype=(pygame.KEYDOWN, pygame.KEYUP)):
+                if event.type == pygame.KEYDOWN:
+                    if event.dict['key'] == pygame.K_RIGHT:
+                        self.x_1 += 4
+                        self.x_2 += 4
+                        self.x_3 += 4
+                        self.x_4 += 4
+                    elif event.dict['key'] == pygame.K_LEFT:
+                        self.x_1 -= 4
+                        self.x_2 -= 4
+                        self.x_3 -= 4
+                        self.x_4 -= 4
+                    pygame.event.post(event)
+                elif event.type == pygame.KEYUP:
+                    pygame.event.clear(eventtype=pygame.KEYDOWN)
+            
         
 
 
