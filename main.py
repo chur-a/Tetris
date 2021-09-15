@@ -25,6 +25,8 @@ class Step():
         self.y_3 = y + self.side_cube
         self.x_4 = x + self.side_cube*2
         self.y_4 = y + self.side_cube
+        self.position = 1
+        
     def show(self):
         pygame.draw.rect(SCREEN,self.color,
                          (self.x_1, self.y_1, self.side_cube, self.side_cube))
@@ -39,24 +41,33 @@ class Step():
         self.y_2 += 4
         self.y_3 += 4
         self.y_4 += 4
-        if pygame.event.peek(pygame.KEYDOWN):
-            for event in pygame.event.get(eventtype=(pygame.KEYDOWN, pygame.KEYUP)):
-                if event.type == pygame.KEYDOWN:
-                    if event.dict['key'] == pygame.K_RIGHT:
-                        self.x_1 += 4
-                        self.x_2 += 4
-                        self.x_3 += 4
-                        self.x_4 += 4
-                    elif event.dict['key'] == pygame.K_LEFT:
-                        self.x_1 -= 4
-                        self.x_2 -= 4
-                        self.x_3 -= 4
-                        self.x_4 -= 4
-                    pygame.event.post(event)
-                elif event.type == pygame.KEYUP:
-                    pygame.event.clear(eventtype=pygame.KEYDOWN)
+        if pygame.key.get_pressed()[pygame.K_RIGHT]:
+            self.x_1 += 4
+            self.x_2 += 4
+            self.x_3 += 4
+            self.x_4 += 4
+        elif pygame.key.get_pressed()[pygame.K_LEFT]:
+            self.x_1 -= 4
+            self.x_2 -= 4
+            self.x_3 -= 4
+            self.x_4 -= 4
             
-        
+    def turn(self):
+        if pygame.key.get_pressed()[pygame.K_SPACE] and self.position == 1:
+            self.x_3 = self.x_1
+            self.y_3 = self.y_1
+            self.x_4 = self.x_1
+            self.y_4 = self.y_1 + self.side_cube
+            self.x_1 += self.side_cube
+            self.y_1 -= self.side_cube
+            self.position = 0
+        elif pygame.key.get_pressed()[pygame.K_SPACE] and self.position == 0:
+            self.x_1 = self.x_3
+            self.y_1 = self.y_3
+            self.x_3 = self.x_1 + self.side_cube
+            self.y_3 = self.y_1 + self.side_cube
+            self.x_4 += self.side_cube*2
+            self.position = 1
 
 
 pygame.init()
@@ -68,12 +79,14 @@ RUN_GAME = True
 CLOCK = pygame.time.Clock()
 objec = Step(100,100,(174,122,14))
 
+
 while RUN_GAME:
     SCREEN.fill((255,255,255))
     CLOCK.tick(20)
     pygame.event.pump()
     objec.show()
     objec.move()
+    objec.turn()
     if pygame.event.peek(pygame.QUIT):
         RUN_GAME = False
     pygame.display.update()
