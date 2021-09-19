@@ -2,7 +2,7 @@ import pygame
 
 class Shell():
     def __init__(self):
-        self.x_line,self.y_line = (650,0)
+        self.x_line,self.y_line = (680,0)
         self.left_rect,self.top_rect = (700,200)
         self.width_rect,self.height_rect = (240,130)
         self.rect_border_radius = 4
@@ -15,10 +15,7 @@ class Shell():
         pygame.draw.rect(SCREEN, (255,0,255), (self.left_rect, self.top_rect, self.width_rect, self.height_rect), width = 5, border_radius = self.rect_border_radius)
         return self.left_rect, self.top_rect
     
-    def draw_shell(self):
-        self.draw_line()
-        self.draw_rect()
-        return self.draw_line(), self.draw_rect()
+
 
 
 class Step():
@@ -34,6 +31,8 @@ class Step():
         self.x_4 = x + self.side_cube*2
         self.y_4 = y + self.side_cube
         self.position = 1
+        self.left_boarder = False
+        self.right_boarder = False
         
     def show(self):
         pygame.draw.rect(SCREEN,self.color,
@@ -44,24 +43,24 @@ class Step():
                          (self.x_3, self.y_3, self.side_cube, self.side_cube))
         pygame.draw.rect(SCREEN,self.color,
                          (self.x_4, self.y_4, self.side_cube, self.side_cube))
-        shell = Shell()
-        shell.draw_shell()
+        
     
     def move(self):
         self.y_1 += 4
         self.y_2 += 4
         self.y_3 += 4
         self.y_4 += 4
-        if pygame.key.get_pressed()[pygame.K_RIGHT]:
-            self.x_1 += 4
-            self.x_2 += 4
-            self.x_3 += 4
-            self.x_4 += 4
-        elif pygame.key.get_pressed()[pygame.K_LEFT]:
-            self.x_1 -= 4
-            self.x_2 -= 4
-            self.x_3 -= 4
-            self.x_4 -= 4
+        if pygame.key.get_pressed()[pygame.K_RIGHT] and not self.right_boarder:
+            self.x_1 += self.side_cube
+            self.x_2 += self.side_cube
+            self.x_3 += self.side_cube
+            self.x_4 += self.side_cube
+        elif pygame.key.get_pressed()[pygame.K_LEFT] and not self.left_boarder:
+            self.x_1 -= self.side_cube
+            self.x_2 -= self.side_cube
+            self.x_3 -= self.side_cube
+            self.x_4 -= self.side_cube
+
             
     def turn(self):
         for event in pygame.event.get(eventtype=pygame.KEYDOWN):
@@ -73,6 +72,11 @@ class Step():
                 self.x_1 += self.side_cube
                 self.y_1 -= self.side_cube
                 self.position = 0
+                if self.right_boarder:
+                    self.x_1 += self.side_cube
+                    self.x_2 += self.side_cube
+                    self.x_3 += self.side_cube
+                    self.x_4 += self.side_cube
             elif event.key == pygame.K_SPACE and self.position == 0:
                 self.x_1 = self.x_3
                 self.y_1 = self.y_3
@@ -80,15 +84,61 @@ class Step():
                 self.y_3 = self.y_1 + self.side_cube
                 self.x_4 += self.side_cube*2
                 self.position = 1
+                if self.right_boarder:
+                    self.x_1 -= self.side_cube
+                    self.x_2 -= self.side_cube
+                    self.x_3 -= self.side_cube
+                    self.x_4 -= self.side_cube
             pygame.event.clear()
         
     def check_collision(self):
-        pass
-    
+        shell = Shell()
+        if self.position == 1:
+            if self.x_1 <= self.side_cube:
+                self.left_boarder = True
+            else:
+                self.left_boarder = False
+            if self.x_4 + self.side_cube >= shell.draw_line() - self.side_cube:
+                self.right_boarder = True
+            else:
+                self.right_boarder = False
+        elif self.position == 0:
+            if self.x_3 <= self.side_cube:
+                self.left_boarder = True
+            else:
+                self.left_boarder = False
+            if self.x_1 + self.side_cube >= shell.draw_line() - self.side_cube:
+                self.right_boarder = True
+            else:
+                self.right_boarder = False
+             
     def act(self):
         self.show()
+        self.check_collision()
         self.move()
         self.turn()
+        
+    def wait(self):
+        shell = Shell()
+        object_2 = Step(shell.draw_rect()[0] + shell.width_rect//2 - 1.5*self.side_cube,
+                        shell.draw_rect()[1] + shell.height_rect//2 - self.side_cube,(174,122,14))
+        object_2.show()
+        
+    def stop(self):
+        if self.position == 1:
+            if self.y_3 + self.side_cube < HEIGHT:
+                return False
+            else:
+                return True
+        elif self.position == 0:
+            if self.y_4 + self.side_cube < HEIGHT:
+                return False
+            else:
+                return True
+
+    
+    
+
 
 
 pygame.init()
@@ -98,14 +148,19 @@ HEIGHT = 1000
 SCREEN = pygame.display.set_mode((WIDTH,HEIGHT))   
 RUN_GAME = True
 CLOCK = pygame.time.Clock()
-objec = Step(100,100,(174,122,14))
+objec = Step(310,-5,(174,122,14))
 
 
 while RUN_GAME:
     SCREEN.fill((255,255,255))
     CLOCK.tick(20)
     pygame.event.pump()
-    objec.act()
+    if not objec.stop():
+        objec.act()
+    else:
+        objec.show()
+    objec.wait()
+
     if pygame.event.peek(pygame.QUIT):
         RUN_GAME = False
     pygame.display.update()
