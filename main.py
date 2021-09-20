@@ -16,8 +16,6 @@ class Shell():
         return self.left_rect, self.top_rect
     
 
-
-
 class Step():
     def __init__(self,x,y,color):
         self.color = color
@@ -43,13 +41,18 @@ class Step():
                          (self.x_3, self.y_3, self.side_cube, self.side_cube))
         pygame.draw.rect(SCREEN,self.color,
                          (self.x_4, self.y_4, self.side_cube, self.side_cube))
-        
     
     def move(self):
-        self.y_1 += 4
-        self.y_2 += 4
-        self.y_3 += 4
-        self.y_4 += 4
+        if pygame.key.get_pressed()[pygame.K_DOWN]:
+            self.y_1 += 44
+            self.y_2 += 44
+            self.y_3 += 44
+            self.y_4 += 44
+        else:
+            self.y_1 += 4
+            self.y_2 += 4
+            self.y_3 += 4
+            self.y_4 += 4
         if pygame.key.get_pressed()[pygame.K_RIGHT] and not self.right_boarder:
             self.x_1 += self.side_cube
             self.x_2 += self.side_cube
@@ -60,7 +63,6 @@ class Step():
             self.x_2 -= self.side_cube
             self.x_3 -= self.side_cube
             self.x_4 -= self.side_cube
-
             
     def turn(self):
         for event in pygame.event.get(eventtype=pygame.KEYDOWN):
@@ -129,11 +131,16 @@ class Step():
             if self.y_3 + self.side_cube < HEIGHT:
                 return False
             else:
+                self.y_3 = self.y_4 = HEIGHT - self.side_cube
+                self.y_1 = self.y_2 = HEIGHT - 2*self.side_cube
                 return True
         elif self.position == 0:
             if self.y_4 + self.side_cube < HEIGHT:
                 return False
             else:
+                self.y_4 = HEIGHT - self.side_cube
+                self.y_3 = self.y_2 = HEIGHT - 2*self.side_cube
+                self.y_1 = HEIGHT - 3*self.side_cube
                 return True
 
     
@@ -148,21 +155,32 @@ HEIGHT = 1000
 SCREEN = pygame.display.set_mode((WIDTH,HEIGHT))   
 RUN_GAME = True
 CLOCK = pygame.time.Clock()
-objec = Step(310,-5,(174,122,14))
+OBJECTS = []
 
+objec = Step(310,-4,(174,122,14))
+objec_w = Step(310,-4,(174,122,14))
 
 while RUN_GAME:
     SCREEN.fill((255,255,255))
     CLOCK.tick(20)
     pygame.event.pump()
+    
     if not objec.stop():
         objec.act()
+        objec_w.wait()
     else:
-        objec.show()
-    objec.wait()
-
+        OBJECTS.append(objec)
+        objec = objec_w
+        objec_w = Step(310,-4,(174,122,14))
+        objec.act()
+        objec_w.wait()
+    
+    for objec_p in OBJECTS:
+        objec_p.show()
+    
     if pygame.event.peek(pygame.QUIT):
         RUN_GAME = False
+    
     pygame.display.update()
         
             
