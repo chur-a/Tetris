@@ -93,30 +93,28 @@ class Step():
                     self.x_4 -= self.side_cube
             pygame.event.clear()
         
-    def check_collision(self):
+    def check(self):
+        self.left_boarder = False
+        self.right_boarder = False
+        self.check_collision_borders()
+        self.check_collision_objects()
+    
+    def check_collision_borders(self):
         shell = Shell()
         if self.position == 1:
             if self.x_1 <= self.side_cube:
                 self.left_boarder = True
-            else:
-                self.left_boarder = False
             if self.x_4 + self.side_cube >= shell.draw_line() - self.side_cube:
                 self.right_boarder = True
-            else:
-                self.right_boarder = False
         elif self.position == 0:
             if self.x_3 <= self.side_cube:
                 self.left_boarder = True
-            else:
-                self.left_boarder = False
             if self.x_1 + self.side_cube >= shell.draw_line() - self.side_cube:
                 self.right_boarder = True
-            else:
-                self.right_boarder = False
              
     def act(self):
         self.show()
-        self.check_collision()
+        self.check()
         self.move()
         self.turn()
         
@@ -126,7 +124,7 @@ class Step():
                         shell.draw_rect()[1] + shell.height_rect//2 - self.side_cube,(174,122,14))
         object_2.show()
         
-    def stop(self):
+    def stop_bottom(self):
         if self.position == 1:
             if self.y_3 + self.side_cube < HEIGHT:
                 return False
@@ -143,8 +141,42 @@ class Step():
                 self.y_1 = HEIGHT - 3*self.side_cube
                 return True
 
-    
-    
+    def check_collision_objects(self): 
+        for object_packed in OBJECTS:
+            Checklist_right = [object_packed.x_1,object_packed.x_2,object_packed.x_3,object_packed.x_4]
+            Checklist_left = [x + self.side_cube for x in Checklist_right]
+            Checklist_height = [object_packed.y_1,object_packed.y_2,object_packed.y_3,object_packed.y_4]
+            for cube in enumerate(Checklist_height):
+                if (self.position == 1):
+                    if (self.y_2 - self.side_cube <= cube[1] <= self.y_4 + self.side_cube and
+                          (self.x_1 == Checklist_left[cube[0]] or self.x_3 == Checklist_left[cube[0]])): 
+                        self.left_boarder = True
+                    if (self.y_2 - self.side_cube <= cube[1] <= self.y_4 + self.side_cube and
+                          (self.x_2 + self.side_cube == Checklist_right[cube[0]] or self.x_4 + self.side_cube == Checklist_right[cube[0]])):
+                        self.right_boarder = True
+            
+    def stop_object(self):
+        for object_packed in OBJECTS:
+            Checklist_x = [object_packed.x_1,object_packed.x_2,object_packed.x_3,object_packed.x_4]
+            Checklist_y = [object_packed.y_1,object_packed.y_2,object_packed.y_3,object_packed.y_4]
+            if self.position == 1:
+                for cube in enumerate(Checklist_x):
+                    if self.x_1 == cube[1] and Checklist_y[cube[0]] <= self.y_1 + self.side_cube <= Checklist_y[cube[0]] + 5:
+                        return True
+                    if self.x_3 == cube[1] and Checklist_y[cube[0]] <= self.y_3 + self.side_cube <= Checklist_y[cube[0]] + 5:
+                        return True
+                    if self.x_4 == cube[1] and Checklist_y[cube[0]] <= self.y_4 + self.side_cube <= Checklist_y[cube[0]] + 5:
+                        return True
+        return False
+                              
+    def stop(self):
+        if self.stop_bottom():
+            return True
+        elif self.stop_object():
+            return True
+        else:
+            return False
+            
 
 
 
@@ -158,7 +190,7 @@ CLOCK = pygame.time.Clock()
 OBJECTS = []
 
 objec = Step(310,-4,(174,122,14))
-objec_w = Step(310,-4,(174,122,14))
+objec_wait = Step(310,-4,(174,122,14))
 
 while RUN_GAME:
     SCREEN.fill((255,255,255))
@@ -167,16 +199,16 @@ while RUN_GAME:
     
     if not objec.stop():
         objec.act()
-        objec_w.wait()
+        objec_wait.wait()
     else:
         OBJECTS.append(objec)
-        objec = objec_w
-        objec_w = Step(310,-4,(174,122,14))
+        objec = objec_wait
+        objec_wait = Step(310,-4,(174,122,14))
         objec.act()
-        objec_w.wait()
+        objec_wait.wait()
     
-    for objec_p in OBJECTS:
-        objec_p.show()
+    for objec_packed in OBJECTS:
+        objec_packed.show()
     
     if pygame.event.peek(pygame.QUIT):
         RUN_GAME = False
