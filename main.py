@@ -44,10 +44,10 @@ class Step():
     
     def move(self):
         if pygame.key.get_pressed()[pygame.K_DOWN]:
-            self.y_1 += 44
-            self.y_2 += 44
-            self.y_3 += 44
-            self.y_4 += 44
+            self.y_1 += 30
+            self.y_2 += 30
+            self.y_3 += 30
+            self.y_4 += 30
         else:
             self.y_1 += 4
             self.y_2 += 4
@@ -147,25 +147,49 @@ class Step():
             Checklist_left = [x + self.side_cube for x in Checklist_right]
             Checklist_height = [object_packed.y_1,object_packed.y_2,object_packed.y_3,object_packed.y_4]
             for cube in enumerate(Checklist_height):
-                if (self.position == 1):
-                    if (self.y_2 - self.side_cube <= cube[1] <= self.y_4 + self.side_cube and
+                if self.position == 1:
+                    if (self.y_2 - self.side_cube < cube[1] < self.y_4 + self.side_cube and
                           (self.x_1 == Checklist_left[cube[0]] or self.x_3 == Checklist_left[cube[0]])): 
                         self.left_boarder = True
-                    if (self.y_2 - self.side_cube <= cube[1] <= self.y_4 + self.side_cube and
+                    if (self.y_2 - self.side_cube < cube[1] < self.y_4 + self.side_cube and
                           (self.x_2 + self.side_cube == Checklist_right[cube[0]] or self.x_4 + self.side_cube == Checklist_right[cube[0]])):
                         self.right_boarder = True
-            
+                elif self.position == 0:
+                    if self.y_1 - self.side_cube < cube[1] < self.y_4 + self.side_cube:
+                        if self.x_1 + self.side_cube == Checklist_right[cube[0]] or self.x_4 + self.side_cube == Checklist_right[cube[0]]:
+                            self.right_boarder = True
+                        if self.x_3 == Checklist_left[cube[0]] or self.x_1 == Checklist_left[cube[0]]:
+                            self.left_boarder = True
+                            
     def stop_object(self):
         for object_packed in OBJECTS:
             Checklist_x = [object_packed.x_1,object_packed.x_2,object_packed.x_3,object_packed.x_4]
             Checklist_y = [object_packed.y_1,object_packed.y_2,object_packed.y_3,object_packed.y_4]
             if self.position == 1:
                 for cube in enumerate(Checklist_x):
-                    if self.x_1 == cube[1] and Checklist_y[cube[0]] <= self.y_1 + self.side_cube <= Checklist_y[cube[0]] + 5:
+                    if self.x_1 == cube[1] and Checklist_y[cube[0]] <= self.y_1 + self.side_cube <= Checklist_y[cube[0]] + self.side_cube:
+                        self.y_1 = self.y_2 = Checklist_y[cube[0]] - self.side_cube
+                        self.y_3 = self.y_4 = self.y_1 + self.side_cube
                         return True
-                    if self.x_3 == cube[1] and Checklist_y[cube[0]] <= self.y_3 + self.side_cube <= Checklist_y[cube[0]] + 5:
+                    if self.x_3 == cube[1] and Checklist_y[cube[0]] <= self.y_3 + self.side_cube <= Checklist_y[cube[0]] + self.side_cube:
+                        self.y_3 = self.y_4 = Checklist_y[cube[0]] - self.side_cube
+                        self.y_1 = self.y_2 = self.y_3 - self.side_cube
                         return True
-                    if self.x_4 == cube[1] and Checklist_y[cube[0]] <= self.y_4 + self.side_cube <= Checklist_y[cube[0]] + 5:
+                    if self.x_4 == cube[1] and Checklist_y[cube[0]] <= self.y_4 + self.side_cube <= Checklist_y[cube[0]] + self.side_cube:
+                        self.y_3 = self.y_4 = Checklist_y[cube[0]] - self.side_cube
+                        self.y_1 = self.y_2 = self.y_3 - self.side_cube
+                        return True
+            elif self.position == 0:
+                for cube in enumerate(Checklist_x):
+                    if self.x_4 == cube[1] and Checklist_y[cube[0]] <= self.y_4 + self.side_cube <= Checklist_y[cube[0]] + self.side_cube:
+                        self.y_4 = Checklist_y[cube[0]] - self.side_cube
+                        self.y_3 = self.y_2 = self.y_4 - self.side_cube
+                        self.y_1 = self.y_3 - self.side_cube
+                        return True
+                    if self.x_2 == cube[1] and Checklist_y[cube[0]] <= self.y_2 + self.side_cube <= Checklist_y[cube[0]] + self.side_cube:
+                        self.y_2 = self.y_3 = Checklist_y[cube[0]] - self.side_cube
+                        self.y_4 = self.y_2 + self.side_cube
+                        self.y_1 = self.y_2 - self.side_cube
                         return True
         return False
                               
