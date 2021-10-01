@@ -249,7 +249,32 @@ class I():
             self.x_3 -= self.side_cube
             self.x_4 -= self.side_cube
         
-    def turn(self):  #FIXME
+    def turn_disable(self):
+        right_distance = WIDTH
+        left_distance = WIDTH
+        shell = Shell()
+        for object_packed in OBJECTS:
+            Checklist_x =[object_packed.x_1,object_packed.x_2,object_packed.x_3,object_packed.x_4]
+            Checklist_y =[object_packed.y_1,object_packed.y_2,object_packed.y_3,object_packed.y_4]
+            for cube in enumerate(Checklist_y):
+                if self.position == 1:
+                    if self.y_2 - self.side_cube <= cube[1] <= self.y_2 + self.side_cube:
+                        if self.x_2 >= Checklist_x[cube[0]] + self.side_cube and left_distance > self.x_2 - (Checklist_x[cube[0]] + self.side_cube):
+                            left_distance = self.x_2 - (Checklist_x[cube[0]] + self.side_cube)
+                        if self.x_2 + self.side_cube <= Checklist_x[cube[0]] and right_distance > Checklist_x[cube[0]] - (self.x_2 + self.side_cube):
+                            right_distance = Checklist_x[cube[0]] - (self.x_2 + self.side_cube)
+        if self.x_2 < left_distance:
+            left_distance = self.x_2
+        if shell.draw_line() - self.x_2 + self.side_cube < right_distance:
+            right_distance = shell.draw_line() - self.x_2 + self.side_cube
+        if left_distance + right_distance <= 3*self.side_cube:
+            print(left_distance,right_distance)
+            return True
+        else:
+            print(left_distance,right_distance)
+            return False
+    
+    def turn(self):
         for event in pygame.event.get(eventtype=pygame.KEYDOWN):
             if event.key == pygame.K_SPACE and self.position == 1:
                 self.y_1 = self.y_3 = self.y_4 = self.y_2
@@ -257,22 +282,44 @@ class I():
                 self.x_3 += self.side_cube
                 self.x_4 += 2*self.side_cube
                 self.position = 0
+                if self.right_boarder == True:
+                    self.x_1 -= 2*self.side_cube
+                    self.x_2 -= 2*self.side_cube
+                    self.x_3 -= 2*self.side_cube
+                    self.x_4 -= 2*self.side_cube
+                elif self.left_boarder == True:
+                    self.x_1 += self.side_cube
+                    self.x_2 += self.side_cube
+                    self.x_3 += self.side_cube
+                    self.x_4 += self.side_cube
             elif event.key == pygame.K_SPACE and self.position == 0:
                 self.x_1 = self.x_3 = self.x_4 = self.x_2
                 self.y_1 -= self.side_cube
                 self.y_3 += self.side_cube
                 self.y_4 += 2*self.side_cube
                 self.position = 1
+                if self.right_boarder == True:
+                    self.x_1 += 2*self.side_cube
+                    self.x_2 += 2*self.side_cube
+                    self.x_3 += 2*self.side_cube
+                    self.x_4 += 2*self.side_cube
+                elif self.left_boarder == True:
+                    self.x_1 -= self.side_cube
+                    self.x_2 -= self.side_cube
+                    self.x_3 -= self.side_cube
+                    self.x_4 -= self.side_cube
+                
     
     def act(self):
         self.show()
         self.check()
         self.move()
-        self.turn()
+        if not self.turn_disable():
+            self.turn()
         
     def wait(self):
         shell = Shell()
-        object_w = I(shell.draw_rect()[0] + shell.width_rect//2 - 2*self.side_cube,
+        object_w = I(shell.draw_rect()[0] + shell.width_rect//2 - self.side_cube//2,
                         shell.draw_rect()[1] + shell.height_rect//2 - 2*self.side_cube,(self.color))
         object_w.show()
     
@@ -360,7 +407,7 @@ SCREEN = pygame.display.set_mode((WIDTH,HEIGHT))
 RUN_GAME = True
 CLOCK = pygame.time.Clock()
 OBJECTS = []
-FIGURES = [Z(310,-4,(174,122,14)),I(400,400,(40,25,77))]
+FIGURES = [Z(310,-4,(174,122,14)),I(310,-4,(40,25,77))]
 
 objec = random.choice(FIGURES)
 objec_wait = random.choice(FIGURES)
