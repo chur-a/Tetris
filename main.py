@@ -268,10 +268,8 @@ class I():
         if shell.draw_line() - self.x_2 + self.side_cube < right_distance:
             right_distance = shell.draw_line() - self.x_2 + self.side_cube
         if left_distance + right_distance <= 3*self.side_cube:
-            print(left_distance,right_distance)
             return True
         else:
-            print(left_distance,right_distance)
             return False
     
     def turn(self):
