@@ -256,13 +256,23 @@ class I():
         for object_packed in OBJECTS:
             Checklist_x =[object_packed.x_1,object_packed.x_2,object_packed.x_3,object_packed.x_4]
             Checklist_y =[object_packed.y_1,object_packed.y_2,object_packed.y_3,object_packed.y_4]
-            for cube in enumerate(Checklist_y):
-                if self.position == 1:
+            if self.position == 1:
+                for cube in enumerate(Checklist_y):
                     if self.y_2 - self.side_cube <= cube[1] <= self.y_2 + self.side_cube:
                         if self.x_2 >= Checklist_x[cube[0]] + self.side_cube and left_distance > self.x_2 - (Checklist_x[cube[0]] + self.side_cube):
                             left_distance = self.x_2 - (Checklist_x[cube[0]] + self.side_cube)
                         if self.x_2 + self.side_cube <= Checklist_x[cube[0]] and right_distance > Checklist_x[cube[0]] - (self.x_2 + self.side_cube):
                             right_distance = Checklist_x[cube[0]] - (self.x_2 + self.side_cube)
+            elif self.position == 0:
+                for cube in enumerate(Checklist_x):
+                    if ((self.x_2 == cube[1] and not self.left_boarder) or (self.x_1 == cube[1] and self.left_boarder) or
+                        (self.x_4 == cube[1] and self.right_boarder)):
+                        if Checklist_y[cube[0]] <= self.y_2 - self.side_cube <= Checklist_y[cube[0]] + self.side_cube:
+                            return True
+                        if Checklist_y[cube[0]] <= self.y_2 + self.side_cube <= Checklist_y[cube[0]] + self.side_cube:
+                            return True
+                        if Checklist_y[cube[0]] <= self.y_2 + 2*self.side_cube <= Checklist_y[cube[0]] + self.side_cube:
+                            return True            
         if self.x_2 < left_distance:
             left_distance = self.x_2
         if shell.draw_line() - self.x_2 + self.side_cube < right_distance:
