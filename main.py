@@ -406,6 +406,40 @@ class I():
         self.right_boarder = False
         self.check_collision_borders()
         self.check_collision_objects()
+        
+    def check_raw_eliminate(self):
+        if self.position == 1:
+            cube_1 = [('self',self.x_1)]
+            cube_2 = [('self',self.x_2)]
+            cube_3 = [('self',self.x_3)]
+            cube_4 = [('self',self.x_4)]
+        elif self.position == 0:
+            cube_1 = cube_2 = cube_3 = cube_4 = [('self',self.x_1),('self',self.x_2),('self',self.x_3),('self',self.x_4)]
+        
+        for object_packed in enumerate(OBJECTS):
+            Checklist_x = [object_packed[1].x_1,object_packed[1].x_2,object_packed[1].x_3,object_packed[1].x_4]
+            for check_cube in Checklist_x:
+                if check_cube == self.x_1:
+                    cube_1.append(tuple(object_packed[0],check_cube))
+                elif check_cube == self.x_2:
+                    cube_2.append(tuple(object_packed[0],check_cube))
+                elif check_cube == self.x_3:
+                    cube_3.append(tuple(object_packed[0],check_cube))
+                elif check_cube == self.x_4:
+                    cube_4.append(tuple(object_packed[0],check_cube))
+                    
+        if len(cube_1) == 22:
+            self.raw_eliminate(cube_1)
+        elif len(cube_2) == 22:
+            self.raw_eliminate(cube_2)
+        elif len(cube_3) == 22:
+            self.raw_eliminate(cube_3)
+        elif len(cube_4) == 22:
+            self.raw_eliminate(cube_4)
+        
+            
+    def raw_eliminate(eleminate_list,self):
+        pass
 
 pygame.init()
 
