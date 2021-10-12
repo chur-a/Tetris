@@ -201,6 +201,19 @@ class Z():
             return True
         else:
             return False
+        
+    def raw_equalizer(self,mark):
+        if self.y_1 < mark:
+            self.y_1 += self.side_cube
+        if self.y_2 < mark:
+            self.y_2 += self.side_cube
+        if self.y_3 < mark:
+            self.y_3 += self.side_cube
+        if self.y_4 < mark:
+            self.y_4 += self.side_cube
+    
+    def raw(self):
+        pass
             
 
 class I():
@@ -407,39 +420,90 @@ class I():
         self.check_collision_borders()
         self.check_collision_objects()
         
-    def check_raw_eliminate(self):
+    def raw(self):
         if self.position == 1:
-            cube_1 = [('self',self.x_1)]
-            cube_2 = [('self',self.x_2)]
-            cube_3 = [('self',self.x_3)]
-            cube_4 = [('self',self.x_4)]
+            rawcube_1 = [('self1',self.y_1)]
+            rawcube_2 = [('self2',self.y_2)]
+            rawcube_3 = [('self3',self.y_3)]
+            rawcube_4 = [('self4',self.y_4)]
         elif self.position == 0:
-            cube_1 = cube_2 = cube_3 = cube_4 = [('self',self.x_1),('self',self.x_2),('self',self.x_3),('self',self.x_4)]
-        
+            rawcube_1 = rawcube_2 = rawcube_3 = rawcube_4 = [('self1',self.y_1),('self2',self.y_2),('self3',self.y_3),('self4',self.y_4)]
         for object_packed in enumerate(OBJECTS):
-            Checklist_x = [object_packed[1].x_1,object_packed[1].x_2,object_packed[1].x_3,object_packed[1].x_4]
-            for check_cube in Checklist_x:
-                if check_cube == self.x_1:
-                    cube_1.append(tuple(object_packed[0],check_cube))
-                elif check_cube == self.x_2:
-                    cube_2.append(tuple(object_packed[0],check_cube))
-                elif check_cube == self.x_3:
-                    cube_3.append(tuple(object_packed[0],check_cube))
-                elif check_cube == self.x_4:
-                    cube_4.append(tuple(object_packed[0],check_cube))
-                    
-        if len(cube_1) == 22:
-            self.raw_eliminate(cube_1)
-        elif len(cube_2) == 22:
-            self.raw_eliminate(cube_2)
-        elif len(cube_3) == 22:
-            self.raw_eliminate(cube_3)
-        elif len(cube_4) == 22:
-            self.raw_eliminate(cube_4)
+            Checklist_y = [object_packed[1].y_1,object_packed[1].y_2,object_packed[1].y_3,object_packed[1].y_4]
+            for i in range(len(Checklist_y)):
+                if Checklist_y[i] == self.y_1:
+                    rawcube_1.append((object_packed[0],i))
+                elif Checklist_y[i] == self.y_2:
+                    rawcube_2.append((object_packed[0],i))
+                elif Checklist_y[i] == self.y_3:
+                    rawcube_3.append((object_packed[0],i))
+                elif Checklist_y[i] == self.y_4:
+                    rawcube_4.append((object_packed[0],i))
+      
+        if len(rawcube_1) == 22:
+            self.raw_equalization(self.y_1)
+            self.raw_rect(self.y_1)
+            self.raw_eliminate(rawcube_1)
+            return True
+        elif len(rawcube_2) == 22:
+            self.raw_equalization(self.y_2)
+            self.raw_rect(self.y_2)
+            self.raw_eliminate(rawcube_2)
+            return True
+        elif len(rawcube_3) == 22:
+            self.raw_equalization(self.y_3)
+            self.raw_rect(self.y_3)
+            self.raw_eliminate(rawcube_3)
+            return True
+        elif len(rawcube_4) == 22:
+            self.raw_equalization(self.y_4)
+            self.raw_rect(self.y_4)
+            self.raw_eliminate(rawcube_4)
+            return True
+          
+    def raw_equalization(self,mark):
+        for object_packed in OBJECTS:
+            object_packed.show()
+            object_packed.raw_equalizer(mark)
         
+        self.show()
+        self.raw_equalizer(mark)
+    
+    def raw_eliminate(self,eleminate_list):  
+        for eleminate in eleminate_list:
+            if eleminate[0] == 'self1':
+                self.y_1 += 1000000
+            elif eleminate[0] == 'self2':
+                self.y_2 += 1000000
+            elif eleminate[0] == 'self3':
+                self.y_3 += 1000000
+            elif eleminate[0] == 'self4':
+                self.y_4 += 1000000
+            else:
+                object_packed = OBJECTS[eleminate[0]]
+                if eleminate[1] == 0:
+                    object_packed.y_1 += 1000000
+                elif eleminate[1] == 1:
+                    object_packed.y_2 += 1000000
+                elif eleminate[1] == 2:
+                    object_packed.y_3 += 1000000
+                elif eleminate[1] == 3:
+                    object_packed.y_4 += 1000000
+
+        
+    def raw_equalizer(self,mark):
+        if self.y_1 < mark:
+            self.y_1 += self.side_cube
+        if self.y_2 < mark:
+            self.y_2 += self.side_cube
+        if self.y_3 < mark:
+            self.y_3 += self.side_cube
+        if self.y_4 < mark:
+            self.y_4 += self.side_cube
+    
+    def raw_rect(self,mark):
+        pygame.draw.rect(SCREEN,(0,0,0),(10,mark,660,self.side_cube))
             
-    def raw_eliminate(eleminate_list,self):
-        pass
 
 pygame.init()
 
@@ -451,25 +515,33 @@ CLOCK = pygame.time.Clock()
 OBJECTS = []
 FIGURES = [Z(310,-4,(174,122,14)),I(310,-4,(40,25,77))]
 
-objec = random.choice(FIGURES)
-objec_wait = random.choice(FIGURES)
+
+objec = I(310,-4,(40,25,77))
+objec_wait = Z(310,-4,(174,122,14))
 
 while RUN_GAME:
     SCREEN.fill((255,255,255))
     CLOCK.tick(20)
     pygame.event.pump()
 
-
-
+    
     if not objec.stop():
         objec.act()
         objec_wait.wait()
     else:
+        if objec.raw():
+            shell = Shell()
+            shell.draw_line()
+            shell.draw_rect()
+            objec_wait.wait()
+            pygame.display.update()
+            pygame.time.wait(2000)
         OBJECTS.append(objec)
         objec = objec_wait
         objec_wait = random.choice([Z(310,-4,(174,122,14)),I(310,-4,(40,25,77))])
         objec.act()
         objec_wait.wait()
+    
     
     for objec_packed in OBJECTS:
         objec_packed.show()
@@ -478,7 +550,8 @@ while RUN_GAME:
         RUN_GAME = False
     
     pygame.display.update()
-        
+    
+
             
             
 pygame.quit()
