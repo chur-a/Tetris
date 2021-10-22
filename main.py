@@ -322,8 +322,8 @@ class I():
         self.x_2 = self.x_3 = self.x_4 = self.x_1
         self.position = 1
         self.color = color
-        self.right_boarder = False
         self.left_boarder = False
+        self.right_boarder = False
     
     def show(self):
         pygame.draw.rect(SCREEN,self.color,
@@ -391,7 +391,6 @@ class I():
             return False
     
     def turn(self):
-        shell = Shell()
         for event in pygame.event.get(eventtype=pygame.KEYDOWN):
             if event.key == pygame.K_SPACE and self.position == 1:
                 self.y_1 = self.y_3 = self.y_4 = self.y_2
@@ -628,6 +627,107 @@ class I():
     
     def raw_rect(self,mark):
         pygame.draw.rect(SCREEN,(0,0,0),(10,mark,660,self.side_cube))
+        
+        
+class J():
+    def __init__(self,x,y,color):
+        self.color = color
+        self.x_1 = x
+        self.y_1 = y
+        self.side_cube = 30
+        self.x_2 = self.x_1
+        self.y_2 = self.y_1 + self.side_cube
+        self.x_3 = self.x_2 + self.side_cube
+        self.y_3 = self.y_2
+        self.x_4 = self.x_3 + self.side_cube
+        self.y_4 = self.y_3
+        self.position = 1
+        
+    def show(self):
+        pygame.draw.rect(SCREEN,self.color,
+                         (self.x_1, self.y_1, self.side_cube, self.side_cube))
+        pygame.draw.rect(SCREEN,self.color,
+                         (self.x_2, self.y_2, self.side_cube, self.side_cube))
+        pygame.draw.rect(SCREEN,self.color,
+                         (self.x_3, self.y_3, self.side_cube, self.side_cube))
+        pygame.draw.rect(SCREEN,self.color,
+                         (self.x_4, self.y_4, self.side_cube, self.side_cube))
+
+    def move(self):
+        if pygame.key.get_pressed()[pygame.K_DOWN]:
+            self.y_1 += 30
+            self.y_2 += 30
+            self.y_3 += 30
+            self.y_4 += 30
+        else:
+            self.y_1 += 4
+            self.y_2 += 4
+            self.y_3 += 4
+            self.y_4 += 4
+        if pygame.key.get_pressed()[pygame.K_RIGHT] and not self.right_boarder:
+            self.x_1 += self.side_cube
+            self.x_2 += self.side_cube
+            self.x_3 += self.side_cube
+            self.x_4 += self.side_cube
+        elif pygame.key.get_pressed()[pygame.K_LEFT] and not self.left_boarder:
+            self.x_1 -= self.side_cube
+            self.x_2 -= self.side_cube
+            self.x_3 -= self.side_cube
+            self.x_4 -= self.side_cube
+            
+    def turn_disable(self):
+        return False
+    
+    def turn(self):
+        for event in pygame.event.get(eventtype=pygame.KEYDOWN):
+            if event.key == pygame.K_SPACE and self.position == 1:
+                self.x_1 += self.side_cube
+                self.y_1 -= self.side_cube
+                self.y_2 -= 2*self.side_cube
+                self.x_3 -= self.side_cube
+                self.y_3 -= self.side_cube
+                self.x_4 -= 2*self.side_cube
+                self.position = 2
+            elif event.key == pygame.K_SPACE and self.position == 2:
+                self.x_1 += self.side_cube
+                self.y_1 += 2*self.side_cube
+                self.x_2 += 2*self.side_cube
+                self.y_2 += self.side_cube
+                self.x_3 += self.side_cube
+                self.y_4 -= self.side_cube
+                self.position = 3
+            elif event.key == pygame.K_SPACE and self.position == 3:
+                self.x_1 -= 2*self.side_cube
+                self.x_2 -= self.side_cube
+                self.y_2 += self.side_cube
+                self.x_4 += self.side_cube
+                self.y_4 -= self.side_cube
+                self.position = 4
+            elif event.key == pygame.K_SPACE and self.position == 4:
+                self.y_1 -= self.side_cube
+                self.x_2 -= self.side_cube
+                self.y_3 += self.side_cube
+                self.x_4 += self.side_cube
+                self.y_4 += 2*self.side_cube
+                self.position = 1
+                
+    def act(self):
+        self.show()
+        self.check()
+        self.move()
+        if not self.turn_disable():
+            self.turn()
+        
+    def wait(self):
+        shell = Shell()
+        object_w = J(shell.draw_rect()[0] + shell.width_rect//2 - 3*self.side_cube//2,
+                     shell.draw_rect()[1] + shell.height_rect//2 - self.side_cube,(self.color))
+        object_w.show()
+            
+    def check(self):
+        pass
+            
+            
             
 
 pygame.init()
@@ -643,6 +743,7 @@ FIGURES = [Z(310,-4,(174,122,14)),I(310,-4,(40,25,77))]
 
 objec = I(310,-4,(40,25,77))
 objec_wait = Z(310,-4,(174,122,14))
+
 
 while RUN_GAME:
     SCREEN.fill((255,255,255))
