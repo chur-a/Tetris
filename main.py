@@ -724,6 +724,50 @@ class J():
                      shell.draw_rect()[1] + shell.height_rect//2 - self.side_cube,(self.color))
         object_w.show()
             
+    def equalization(self,level,axis,basecube_numb=None):
+        if axis == 'x':
+            if self.position == 1:
+                self.y_2 = self.y_3 = self.y_4 = level - self.side_cube
+                self.y_1 = self.y_2 - self.side_cube
+            elif self.position == 2:
+                if basecube_numb == 4:
+                    self.y_4 = level - self.side_cube
+                    self.y_3 = level - 2*self.side_cube
+                    self.y_2 = self.y_1 = level - 3*self.side_cube
+                elif basecube_numb == 1:
+                    self.y_1 = self.y_2 = level - self.side_cube
+                    self.y_3 = level
+                    self.y_4 = level + self.side_cube
+            elif self.position == 3:
+                if basecube_numb == 1:
+                    self.y_1 = level - self.side_cube
+                    self.y_2 = self.y_3 = self.y_4 = level - 2*self.side_cube
+                elif basecube_numb in [3,4]:
+                    self.y_4 = self.y_3 = self.y_2 = level - self.side_cube
+                    self.y_1 = level
+            elif self.position == 4:
+                self.y_1 = self.y_2 = level - self.side_cube
+                self.y_3 = level - 2*self.side_cube
+                self.y_4 = level - 3*self.side_cube
+        elif axis == 'y':
+            if self.position == 1:
+                self.x_4 = level - self.side_cube - 10
+                self.x_3 = level - 2*self.side_cube - 10
+                self.x_2 = self.x_1 = level - 3*self.side_cube - 10
+            elif self.position == 2:
+                self.x_1 = level - self.side_cube - 10
+                self.x_2 = self.x_3 = self.x_4 = level - 2*self.side_cube - 10
+            elif self.position == 3:
+                self.x_1 = self.x_2 = level - self.side_cube - 10
+                self.x_3 = level - 2*self.side_cube - 10
+                self.x_4 = level - 3*self.side_cube - 10
+            elif self.position == 4:
+                self.x_2 = self.x_3 = self.x_4 = level - self.side_cube - 10
+                self.x_1 = level - 2*self.side_cube - 10
+
+                
+
+    
     def check(self):
         self.left_boarder = False
         self.right_boarder = False
@@ -734,31 +778,28 @@ class J():
         shell = Shell()
         if self.position == 1:
             if self.x_1 <= self.side_cube:
-                #self.equalization(0,'-y')
                 self.left_boarder = True
-            elif self.x_4 + self.side_cube >= shell.draw_line() - self.side_cube:
-                #self.equalization(shell.draw_line(),'y')
+            if self.x_4 + self.side_cube >= shell.draw_line() - self.side_cube:
+                self.equalization(shell.draw_line(),'y')
                 self.right_boarder = True
         elif self.position == 2:
             if self.x_2 <= self.side_cube:
-                #self.equalization(0,'-y')
+                self.equalization(0,'-y')
                 self.left_boarder = True
-            elif self.x_1 + self.side_cube >= shell.draw_line() - self.side_cube:
-                #self.equalization(shell.draw_line(),'y')
+            if self.x_1 + self.side_cube >= shell.draw_line() - self.side_cube:
+                self.equalization(shell.draw_line(),'y')
                 self.right_boarder = True
         elif self.position == 3:
             if self.x_4 <= self.side_cube:
-                #self.equalization(0,'-y')
                 self.left_boarder = True
-            elif self.x_2 + self.side_cube >= shell.draw_line() - self.side_cube:
-                #self.equalization(shell.draw_line(),'y')
+            if self.x_2 + self.side_cube >= shell.draw_line() - self.side_cube:
+                self.equalization(shell.draw_line(),'y')
                 self.right_boarder = True
         elif self.position == 4:
             if self.x_1 <= self.side_cube:
-                #self.equalization(0,'-y')
                 self.left_boarder = True
-            elif self.x_2 + self.side_cube >= shell.draw_line() - self.side_cube:
-                #self.equalization(shell.draw_line(),'y')
+            if self.x_2 + self.side_cube >= shell.draw_line() - self.side_cube:
+                self.equalization(shell.draw_line(),'y')
                 self.right_boarder = True
         
     def check_collision_objects(self):
@@ -814,11 +855,71 @@ class J():
             return False
         
     def stop_bottom(self):
-        pass
+        if self.position == 1:
+            if self.y_2 + self.side_cube < HEIGHT:
+                return False
+            else:
+                self.equalization(HEIGHT,'x')
+                return True
+        elif self.position == 2:
+            if self.y_4 + self.side_cube < HEIGHT:
+                return False
+            else:
+                self.equalization(HEIGHT,'x')
+                return True
+        elif self.position == 3:
+            if self.y_1 + self.side_cube < HEIGHT:
+                return False
+            else:
+                self.equalization(HEIGHT,'x')
+                return True
+        elif self.position == 4:
+            if self.y_1 + self.side_cube < HEIGHT:
+                return False
+            else:
+                self.equalization(HEIGHT,'x')
+                return True
     
     def stop_object(self):
-        pass
-            
+        for object_packed in OBJECTS:
+            Checklist_x = [object_packed.x_1,object_packed.x_2,object_packed.x_3,object_packed.x_4]
+            Checklist_y = [object_packed.y_1,object_packed.y_2,object_packed.y_3,object_packed.y_4]
+            if self.position == 1:
+                for cube in enumerate(Checklist_x):
+                    if (Checklist_y[cube[0]] <= self.y_2 + self.side_cube < Checklist_y[cube[0]] + self.side_cube and
+                          cube[1] in [self.x_2,self.x_3,self.x_4]):
+                        self.equalization(Checklist_y[cube[0]],'x')
+                        return True
+            elif self.position == 2:
+                for cube in enumerate(Checklist_x):
+                    if (Checklist_y[cube[0]] <= self.y_4 + self.side_cube < Checklist_y[cube[0]] + self.side_cube and
+                          cube[1] == self.x_4):
+                        self.equalization(Checklist_y[cube[0]],'x',4)
+                        return True
+                    elif (Checklist_y[cube[0]] <= self.y_1 + self.side_cube < Checklist_y[cube[0]] + self.side_cube and
+                            cube[1] == self.x_1):
+                        self.equalization(Checklist_y[cube[0]],'x',1)
+                        return True
+            elif self.position == 3:
+                for cube in enumerate(Checklist_x):
+                    if (Checklist_y[cube[0]] <= self.y_1 + self.side_cube < Checklist_y[cube[0]] + self.side_cube and
+                          cube[1] == self.x_1):
+                        self.equalization(Checklist_y[cube[0]],'x',1)
+                        return True
+                    elif (Checklist_y[cube[0]] <= self.y_4 + self.side_cube < Checklist_y[cube[0]] + self.side_cube and
+                            cube[1] in [self.x_4,self.x_3]):
+                        self.equalization(Checklist_y[cube[0]],'x',3)
+                        return True
+            elif self.position == 4:
+                for cube in enumerate(Checklist_x):
+                    if (Checklist_y[cube[0]] <= self.y_1 + self.side_cube < Checklist_y[cube[0]] + self.side_cube and
+                          cube[1] in [self.x_1,self.x_2]):
+                        self.equalization(Checklist_y[cube[0]],'x')
+                        return True
+        return False
+        
+    def raw(self):
+        return False
             
             
 
@@ -856,7 +957,7 @@ while RUN_GAME:
             pygame.time.wait(2000)
         OBJECTS.append(objec)
         objec = objec_wait
-        objec_wait = random.choice([Z(310,-4,(174,122,14)),I(310,-4,(40,25,77))])
+        objec_wait = random.choice([Z(310,-4,(174,122,14)),I(310,-4,(40,25,77)),J(310,-4,(0,128,0))])
         objec.act()
         objec_wait.wait()
     
