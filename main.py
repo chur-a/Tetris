@@ -1103,6 +1103,19 @@ class S():
                 self.position = 1
                 
     def turn_disable(self):
+        for object_packed in OBJECTS:
+            Checklist_x =[object_packed.x_1,object_packed.x_2,object_packed.x_3,object_packed.x_4]
+            Checklist_y =[object_packed.y_1,object_packed.y_2,object_packed.y_3,object_packed.y_4]
+            if self.position == 1:
+                for cube in enumerate(Checklist_y):
+                    if (self.y_1 - 2*self.side_cube < cube[1] < self.y_1 - self.side_cube and
+                        Checklist_x[cube[0]] == self.x_4):
+                         return True
+            elif self.position == 0:
+                for cube in enumerate(Checklist_y):
+                    if (self.y_3 - self.side_cube < cube[1] < self.y_3 and
+                        self.x_3 + self.side_cube == Checklist_x[cube[0]]):
+                        return True
         return False
     
     def stop(self):
