@@ -1049,8 +1049,8 @@ class S():
         self.x_4 = x - self.side_cube*2
         self.y_4 = y + self.side_cube
         self.position = 1
-        self.left_boarder = False
-        self.right_boarder = False
+        """self.left_boarder = False
+        self.right_boarder = False"""
         
     def show(self):
         pygame.draw.rect(SCREEN,self.color,
@@ -1340,6 +1340,65 @@ class S():
     def raw_rect(self,mark):
         pygame.draw.rect(SCREEN,(0,0,0),(10,mark,660,self.side_cube))
 
+
+class T():
+
+    def __init__(self,x,y,color):
+        self.color = color
+        self.side_cube = 30
+        self.x_1 = x
+        self.y_1 = y
+        self.x_2 = x - self.side_cube
+        self.y_2 = y - self.side_cube
+        self.x_3 = x
+        self.y_3 = y - self.side_cube
+        self.x_4 = x + self.side_cube
+        self.y_4 = y - self.side_cube
+        self.position = 1
+
+    def show(self):
+        pygame.draw.rect(SCREEN,self.color,
+                         (self.x_1, self.y_1, self.side_cube, self.side_cube))
+        pygame.draw.rect(SCREEN,self.color,
+                         (self.x_2, self.y_2, self.side_cube, self.side_cube))
+        pygame.draw.rect(SCREEN,self.color,
+                         (self.x_3, self.y_3, self.side_cube, self.side_cube))
+        pygame.draw.rect(SCREEN,self.color,
+                         (self.x_4, self.y_4, self.side_cube, self.side_cube))
+
+    def move(self):
+        if pygame.key.get_pressed()[pygame.K_DOWN]:
+            self.y_1 += 30
+            self.y_2 += 30
+            self.y_3 += 30
+            self.y_4 += 30
+        else:
+            self.y_1 += 4
+            self.y_2 += 4
+            self.y_3 += 4
+            self.y_4 += 4
+        if (pygame.key.get_pressed()[pygame.K_RIGHT] and not self.right_boarder and
+         not pygame.key.get_pressed()[pygame.K_DOWN]):
+            self.x_1 += self.side_cube
+            self.x_2 += self.side_cube
+            self.x_3 += self.side_cube
+            self.x_4 += self.side_cube
+        elif (pygame.key.get_pressed()[pygame.K_LEFT] and not self.left_boarder and
+         not pygame.key.get_pressed()[pygame.K_DOWN]):
+            self.x_1 -= self.side_cube
+            self.x_2 -= self.side_cube
+            self.x_3 -= self.side_cube
+            self.x_4 -= self.side_cube
+
+    def act(self):
+        self.show()
+        self.move()
+
+    def stop(self):
+        pass
+
+    def wait(self):
+        pass
             
 
 pygame.init()
@@ -1379,7 +1438,8 @@ while RUN_GAME:
         objec_wait = random.choice([Z(310,-4,(174,122,14)),
                                     I(310,-4,(40,25,77)),
                                     J(310,-4,(0,128,0)),
-                                    S(310,-4,(43,52,65))])
+                                    S(310,-4,(43,52,65)),
+                                    T(310,-4,(220,20,60))])
         objec.act()
         objec_wait.wait()
     
