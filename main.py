@@ -1745,6 +1745,102 @@ class T():
         pygame.draw.rect(SCREEN, (0, 0, 0), (10, mark, 660, self.side_cube))
 
 
+class L():
+
+    def __init__(self, x, y, color):
+        self.color = color
+        self.side_cube = 30
+        self.x_1 = x
+        self.y_1 = y
+        self.x_2 = x - self.side_cube
+        self.y_2 = y
+        self.x_3 = x - self.side_cube
+        self.y_3 = y - self.side_cube
+        self.x_4 = x - self.side_cube
+        self.y_4 = y - 2*self.side_cube
+        self.position = 1
+
+    def show(self):
+        pygame.draw.rect(SCREEN, self.color,
+                         (self.x_1, self.y_1, self.side_cube, self.side_cube))
+        pygame.draw.rect(SCREEN, self.color,
+                         (self.x_2, self.y_2, self.side_cube, self.side_cube))
+        pygame.draw.rect(SCREEN, self.color,
+                         (self.x_3, self.y_3, self.side_cube, self.side_cube))
+        pygame.draw.rect(SCREEN, self.color,
+                         (self.x_4, self.y_4, self.side_cube, self.side_cube))
+
+    def move(self):
+        if pygame.key.get_pressed()[pygame.K_DOWN]:
+            self.y_1 += 30
+            self.y_2 += 30
+            self.y_3 += 30
+            self.y_4 += 30
+        else:
+            self.y_1 += 4
+            self.y_2 += 4
+            self.y_3 += 4
+            self.y_4 += 4
+        if (pygame.key.get_pressed()[pygame.K_RIGHT] and not self.right_boarder and
+         not pygame.key.get_pressed()[pygame.K_DOWN]):
+            self.x_1 += self.side_cube
+            self.x_2 += self.side_cube
+            self.x_3 += self.side_cube
+            self.x_4 += self.side_cube
+        elif (pygame.key.get_pressed()[pygame.K_LEFT] and not self.left_boarder and
+         not pygame.key.get_pressed()[pygame.K_DOWN]):
+            self.x_1 -= self.side_cube
+            self.x_2 -= self.side_cube
+            self.x_3 -= self.side_cube
+            self.x_4 -= self.side_cube
+
+    def turn(self):
+        for event in pygame.event.get(eventtype=pygame.KEYDOWN):
+            if event.key == pygame.K_SPACE and self.position == 1:
+                self.x_1 -= self.side_cube
+                self.y_2 -= self.side_cube
+                self.x_3 += self.side_cube
+                self.x_4 += 2*self.side_cube
+                self.y_4 += self.side_cube
+                self.position = 2
+            elif event.key == pygame.K_SPACE and self.position == 2:
+                self.y_1 -= 2*self.side_cube
+                self.x_2 += self.side_cube
+                self.y_2 -= self.side_cube
+                self.x_4 -= self.side_cube
+                self.y_4 += self.side_cube
+                self.position = 3
+            elif event.key == pygame.K_SPACE and self.position == 3:
+                self.x_1 += 2*self.side_cube
+                self.y_1 += self.side_cube
+                self.x_2 += self.side_cube
+                self.y_2 += 2*self.side_cube
+                self.y_3 += self.side_cube
+                self.x_4 -= self.side_cube
+                self.position = 4
+            elif event.key == pygame.K_SPACE and self.position == 4:
+                self.x_1 -= self.side_cube
+                self.y_1 += self.side_cube
+                self.x_2 -= 2*self.side_cube
+                self.x_3 -= self.side_cube
+                self.y_3 -= self.side_cube
+                self.y_4 -= 2*self.side_cube
+                self.position = 1
+
+    def wait(self):
+        shell = Shell()
+        object_w = L(shell.draw_rect()[0] + shell.width_rect // 2,
+                     shell.draw_rect()[1] + shell.height_rect // 2 + self.side_cube // 2, self.color)
+        object_w.show()
+        
+    def stop(self):
+        return False
+
+    def act(self):
+        self.show()
+        self.move()
+        self.turn()
+
 pygame.init()
 
 WIDTH = 1000
@@ -1761,11 +1857,10 @@ objec_wait = Z(310, -4, (174, 122, 14))
 
 
 while RUN_GAME:
-    SCREEN.fill((255,255,255))
+    SCREEN.fill((255, 255, 255))
     CLOCK.tick(20)
     pygame.event.pump()
 
-    
     if not objec.stop():
         objec.act()
         objec_wait.wait()
@@ -1779,15 +1874,15 @@ while RUN_GAME:
             pygame.time.wait(2000)
         OBJECTS.append(objec)
         objec = objec_wait
-        objec_wait = random.choice([Z(310,-4,(174,122,14)),
-                                    I(310,-4,(40,25,77)),
-                                    J(310,-4,(0,128,0)),
-                                    S(310,-4,(43,52,65)),
-                                    T(310,-4,(220,20,60))])
+        objec_wait = random.choice([Z(310, -4, (174, 122, 14)),
+                                    I(310, -4, (40, 25, 77)),
+                                    J(310, -4, (0, 128, 0)),
+                                    S(310, -4, (43, 52, 65)),
+                                    T(310, -4, (220, 20, 60)),
+                                    L(310, -4, (255, 165, 0))])
         objec.act()
         objec_wait.wait()
-    
-    
+
     for objec_packed in OBJECTS:
         objec_packed.show()
     
