@@ -1039,7 +1039,7 @@ class J():
         
         
 class S():
-    def __init__(self,x,y,color):
+    def __init__(self, x, y, color):
         self.color = color
         self.x_1 = x
         self.y_1 = y
@@ -1048,12 +1048,10 @@ class S():
         self.y_2 = y
         self.x_3 = x - self.side_cube
         self.y_3 = y + self.side_cube
-        self.x_4 = x - self.side_cube*2
+        self.x_4 = x - 2*self.side_cube
         self.y_4 = y + self.side_cube
         self.position = 1
-        """self.left_boarder = False
-        self.right_boarder = False"""
-        
+
     def show(self):
         pygame.draw.rect(SCREEN,self.color,
                          (self.x_1, self.y_1, self.side_cube, self.side_cube))
@@ -1097,29 +1095,45 @@ class S():
                 self.y_1 -= self.side_cube
                 self.position = 0
             elif event.key == pygame.K_SPACE and self.position == 0:
-                self.x_1 += self.side_cube*2
+                self.x_1 += 2*self.side_cube
                 self.x_2 = self.x_3
                 self.x_4 -= self.side_cube
                 self.y_1 += self.side_cube
                 self.y_3 += self.side_cube
                 self.position = 1
-                if self.right_boarder:
-                    shell = Shell()
-                    self.equalization('y',shell.draw_line())
-                
+                self.turn_adjustment(self.right_flag)
+
+    def turn_adjustment(self, right_flag):
+        shell = Shell()
+        if (
+            right_flag or
+            self.x_1 + self.side_cube > shell.draw_line()
+        ):
+            self.x_1 -= self.side_cube
+            self.x_2 -= self.side_cube
+            self.x_3 -= self.side_cube
+            self.x_4 -= self.side_cube
+
     def turn_disable(self):
+        self.left_flag = False
+        self.right_flag = False
         for object_packed in OBJECTS:
             Checklist_x =[object_packed.x_1,object_packed.x_2,object_packed.x_3,object_packed.x_4]
             Checklist_y =[object_packed.y_1,object_packed.y_2,object_packed.y_3,object_packed.y_4]
             if self.position == 1:
-                for cube in enumerate(Checklist_y):
-                    if (self.y_1 - 2*self.side_cube < cube[1] < self.y_1 - self.side_cube and
-                        Checklist_x[cube[0]] == self.x_4):
+                for cube in enumerate(Checklist_x):
+                    if (Checklist_y[cube[0]] <= self.y_2 - self.side_cube < Checklist_y[cube[0]] + self.side_cube and
+                        cube[1] == self.x_2 - self.side_cube):
                          return True
             elif self.position == 0:
-                for cube in enumerate(Checklist_y):
-                    if (self.y_3 - self.side_cube < cube[1] < self.y_3 and
-                        self.x_3 + self.side_cube == Checklist_x[cube[0]]):
+                for cube in enumerate(Checklist_x):
+                    if self.check_on_cube(-self.x_4, self.y_4, cube[1], Checklist_y[cube[0]]):
+                        return True
+                    if self.check_on_cube(self.x_3, self.y_3, cube[1], Checklist_y[cube[0]]):
+                        self.right_flag = True
+                    elif self.check_on_cube(-(self.x_4 - self.side_cube), self.y_4, cube[1], Checklist_y[cube[0]]):
+                        self.left_flag = True
+                    if self.left_flag and self.right_flag:
                         return True
         return False
     
@@ -1134,13 +1148,13 @@ class S():
             if self.y_3 + self.side_cube < HEIGHT:
                 return False
             else:
-                self.equalization('x',HEIGHT,3)
+                self.equalization(HEIGHT, 3)
                 return True
         elif self.position == 0:
             if self.y_4 + self.side_cube < HEIGHT:
                 return False
             else:
-                self.equalization('x',HEIGHT,4)
+                self.equalization(HEIGHT, 4)
                 return True
     
     def stop_object(self):
@@ -1150,22 +1164,22 @@ class S():
             if self.position == 1:
                 for cube in enumerate(Checklist_x):
                     if (Checklist_y[cube[0]] <= self.y_4 + self.side_cube <= Checklist_y[cube[0]] + self.side_cube and
-                      cube[1] in (self.x_4,self.x_3)):
-                        self.equalization('x',Checklist_y[cube[0]],4)
+                      cube[1] in (self.x_4, self.x_3)):
+                        self.equalization(Checklist_y[cube[0]], 4)
                         return True
                     elif (Checklist_y[cube[0]] <= self.y_1 + self.side_cube <= Checklist_y[cube[0]] + self.side_cube and
                       cube[1] == self.x_1):
-                        self.equalization('x',Checklist_y[cube[0]],1)
+                        self.equalization(Checklist_y[cube[0]], 1)
                         return True
             elif self.position == 0:
                 for cube in enumerate(Checklist_x):
                     if (Checklist_y[cube[0]] <= self.y_4 + self.side_cube <= Checklist_y[cube[0]] + self.side_cube and
                       cube[1] == self.x_4):
-                        self.equalization('x',Checklist_y[cube[0]],4)
+                        self.equalization(Checklist_y[cube[0]], 4)
                         return True
                     elif (Checklist_y[cube[0]] <= self.y_2 + self.side_cube <= Checklist_y[cube[0]] + self.side_cube and
                       cube[1] == self.x_2):
-                        self.equalization('x',Checklist_y[cube[0]],2)
+                        self.equalization(Checklist_y[cube[0]], 2)
                         return True
         return False            
                            
@@ -1181,53 +1195,43 @@ class S():
         self.right_boarder = False
         self.check_collision_objects()
         self.check_collision_borders()
-        
-    def check_collision_borders(self):
-        shell = Shell()
-        if self.position == 1:
-            if self.x_4 <= self.side_cube:
-                shell.draw_line()
-                self.left_boarder = True
-            elif self.x_1 + self.side_cube >= shell.draw_line() - self.side_cube:
-                self.right_boarder = True
-        elif self.position == 0:
-            if self.x_1 <= self.side_cube:
-                shell.draw_line()
-                self.left_boarder = True
-            elif self.x_3 + self.side_cube >= shell.draw_line() - self.side_cube:
-                self.right_boarder = True
-                
+
+    def check_on_cube(self, object_cube_x, object_cube_y, checked_cube_x, checked_cube_y):
+        if (checked_cube_y < object_cube_y + self.side_cube < checked_cube_y + 2*self.side_cube and
+                checked_cube_x == abs(object_cube_x + self.side_cube)):
+            return True
+        return False
+
     def check_collision_objects(self):
         for object_packed in OBJECTS:
-            Checklist_x = [object_packed.x_1,object_packed.x_2,object_packed.x_3,object_packed.x_4]
-            Checklist_y = [object_packed.y_1,object_packed.y_2,object_packed.y_3,object_packed.y_4]
+            Checklist_x = [object_packed.x_1, object_packed.x_2, object_packed.x_3, object_packed.x_4]
+            Checklist_y = [object_packed.y_1, object_packed.y_2, object_packed.y_3, object_packed.y_4]
             for cube in enumerate(Checklist_x):
-                if self.position == 1:
-                    if (Checklist_y[cube[0]] <= self.y_1 + self.side_cube <= Checklist_y[cube[0]] + 2*self.side_cube and
-                      self.x_1 + self.side_cube == cube[1]):
-                        self.right_boarder = True
-                    elif (Checklist_y[cube[0]] <= self.y_3 + self.side_cube <= Checklist_y[cube[0]] + 2*self.side_cube and
-                      self.x_3 + self.side_cube == cube[1]):
-                        self.right_boarder = True
-                    if (Checklist_y[cube[0]] <= self.y_2 + self.side_cube <= Checklist_y[cube[0]] + 2*self.side_cube and
-                      self.x_2 - self.side_cube == cube[1]):
-                        self.left_boarder = True
-                    elif (Checklist_y[cube[0]] <= self.y_4 + self.side_cube <= Checklist_y[cube[0]] + 2*self.side_cube and
-                      self.x_4 - self.side_cube == cube[1]):
-                        self.left_boarder = True
-                elif self.position == 0:
-                    if (Checklist_y[cube[0]] <= self.y_1 + self.side_cube <= Checklist_y[cube[0]] + 2*self.side_cube and
-                      self.x_1 + self.side_cube == cube[1]):
-                        self.right_boarder = True
-                    elif (Checklist_y[cube[0]] <= self.y_3 + 2*self.side_cube <= Checklist_y[cube[0]] + 3*self.side_cube and
-                      self.x_3 + self.side_cube == cube[1]):
-                        self.right_boarder = True
-                    if (Checklist_y[cube[0]] <= self.y_2 + self.side_cube <= Checklist_y[cube[0]] + 3*self.side_cube and
-                      self.x_2 - self.side_cube == cube[1]):
-                        self.left_boarder = True
-                    elif (Checklist_y[cube[0]] <= self.y_4 + self.side_cube <= Checklist_y[cube[0]] + 2*self.side_cube and
-                      self.x_4 - self.side_cube == cube[1]):
-                        self.left_boarder = True
+                if (
+                        self.check_on_cube(self.x_2, self.y_2, cube[1], Checklist_y[cube[0]]) or
+                        self.check_on_cube(self.x_1, self.y_1, cube[1], Checklist_y[cube[0]]) or
+                        self.check_on_cube(self.x_3, self.y_3, cube[1], Checklist_y[cube[0]]) or
+                        self.check_on_cube(self.x_4, self.y_4, cube[1], Checklist_y[cube[0]])
+                ):
+                    self.right_boarder = True
+                if (
+                        self.check_on_cube(-self.x_2, self.y_2, cube[1], Checklist_y[cube[0]]) or
+                        self.check_on_cube(-self.x_1, self.y_1, cube[1], Checklist_y[cube[0]]) or
+                        self.check_on_cube(-self.x_3, self.y_3, cube[1], Checklist_y[cube[0]]) or
+                        self.check_on_cube(-self.x_4, self.y_4, cube[1], Checklist_y[cube[0]])
+                ):
+                    self.left_boarder = True
+
+    def check_collision_borders(self):
+        shell = Shell()
+        for x in [self.x_1, self.x_2, self.x_3, self.x_4]:
+            if x <= self.side_cube:
+                shell.draw_line()
+                self.left_boarder = True
+                break
+            elif x + self.side_cube >= shell.draw_line() - self.side_cube:
+                self.right_boarder = True
+                break
     
     def wait(self):
         shell = Shell()
@@ -1235,28 +1239,23 @@ class S():
                      shell.draw_rect()[1] + shell.height_rect // 2 - self.side_cube, self.color)
         object_w.show()
         
-    def equalization(self, axis, level, basecube_numb=None):
-        if axis == 'x':
-            if self.position == 1:
-                if basecube_numb in [3,4]:
-                    self.y_4 = self.y_3 = level - self.side_cube
-                    self.y_2 = self.y_1 = level - 2*self.side_cube
-                elif basecube_numb == 1:
-                    self.y_1 = self.y_2 = level - self.side_cube
-                    self.y_3 = self.y_4 = level
-            elif self.position == 0:
-                if basecube_numb == 4:
-                    self.y_4 = level - self.side_cube
-                    self.y_3 = self.y_2 = level - 2*self.side_cube
-                    self.y_1 = level - 3*self.side_cube
-                elif basecube_numb == 2:
-                    self.y_2 = self.y_3 = level - self.side_cube
-                    self.y_4 = level
-                    self.y_1 = level - 2*self.side_cube
-        elif axis == 'y':
-            self.x_1 = level - self.side_cube - 10
-            self.x_2 = self.x_3 = level - 2*self.side_cube - 10
-            self.x_4 = level - 3*self.side_cube - 10
+    def equalization(self, level, basecube_numb=None):
+        if self.position == 1:
+            if basecube_numb in [3,4]:
+                self.y_4 = self.y_3 = level - self.side_cube
+                self.y_2 = self.y_1 = level - 2*self.side_cube
+            elif basecube_numb == 1:
+                self.y_1 = self.y_2 = level - self.side_cube
+                self.y_3 = self.y_4 = level
+        elif self.position == 0:
+            if basecube_numb == 4:
+                self.y_4 = level - self.side_cube
+                self.y_3 = self.y_2 = level - 2*self.side_cube
+                self.y_1 = level - 3*self.side_cube
+            elif basecube_numb == 2:
+                self.y_2 = self.y_3 = level - self.side_cube
+                self.y_4 = level
+                self.y_1 = level - 2*self.side_cube
         
     def raw(self):
         if self.position == 1:
@@ -2299,6 +2298,7 @@ class O():
     def raw_rect(self, mark):
         pygame.draw.rect(SCREEN, (0, 0, 0), (10, mark, 660, self.side_cube))
 
+
 pygame.init()
 
 WIDTH = 1000
@@ -2307,7 +2307,6 @@ SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
 RUN_GAME = True
 CLOCK = pygame.time.Clock()
 OBJECTS = []
-FIGURES = [Z(310, -4, (174, 122, 14)), I(310, -4, (40, 25, 77))]
 
 
 objec = I(310, -4, (40, 25, 77))
