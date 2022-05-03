@@ -2299,6 +2299,50 @@ class O():
         pygame.draw.rect(SCREEN, (0, 0, 0), (10, mark, 660, self.side_cube))
 
 
+class GameTools():
+
+    def __init__(self):
+        self.font = pygame.font.Font("assets/Font/tahoma.ttf", 24)
+        self.font.set_bold(True)
+        self.time = pygame.time.get_ticks() // 1000
+        self.fps = round(CLOCK.get_fps())
+        self.score = 0
+
+    def blit_score_table(self, pos: tuple):
+        x, y = pos
+        black = (0, 0, 0)
+        score_table = (self.font.render('Time: {}'.format(self.time), True, black),
+                       self.font.render('FPS: {}'.format(self.fps), True, black),
+                       self.font.render('Score: {}'.format(self.score), True, black))
+        for line_surface in score_table:
+            SCREEN.blit(line_surface, (x, y))
+            height_line = line_surface.get_height()
+            y += height_line
+
+    def game_over_check(self, Checklist):
+        for y in Checklist:
+            if y < 0:
+                return True
+        return False
+
+    def game_over(self):
+            pause = True
+            black = (0, 0, 0)
+            while pause:
+                SCREEN.fill((255, 255, 255))
+                game_over_text = self.font.render('GAME OVER', True, black)
+                final_score_text = self.font.render('Your Score: {}'.format(self.score), True, black)
+                raw_height = game_over_text.get_height()
+                raw_width = game_over_text.get_width()
+                x, y = (WIDTH // 2 - raw_width // 2, HEIGHT // 2 - raw_height)
+                SCREEN.blit(game_over_text, (x, y))
+                SCREEN.blit(final_score_text, (x, y + raw_height))
+                pygame.display.update()
+                if pygame.event.peek(pygame.QUIT):
+                    pause = False
+
+
+
 pygame.init()
 
 WIDTH = 1000
@@ -2308,7 +2352,7 @@ RUN_GAME = True
 CLOCK = pygame.time.Clock()
 OBJECTS = []
 
-
+Game = GameTools()
 objec = I(310, -4, (40, 25, 77))
 objec_wait = Z(310, -4, (174, 122, 14))
 
@@ -2327,8 +2371,10 @@ while RUN_GAME:
             shell.draw_line()
             shell.draw_rect()
             objec_wait.wait()
+            Game.blit_score_table((740, 800))
             pygame.display.update()
             pygame.time.wait(2000)
+            Game.score += 10
         OBJECTS.append(objec)
         objec = objec_wait
         objec_wait = random.choice([Z(310, -4, (174, 122, 14)),
@@ -2348,7 +2394,20 @@ while RUN_GAME:
         RUN_GAME = False
     
     pygame.event.clear(eventtype=pygame.KEYDOWN)
+
+    Game.time = pygame.time.get_ticks() // 1000
+    Game.fps = round(CLOCK.get_fps())
+    Game.blit_score_table((740, 800))
+
     pygame.display.update()
+
+    try:
+        object_check_go = OBJECTS[-1]
+        if Game.game_over_check([object_check_go.y_1, object_check_go.y_2, object_check_go.y_3, object_check_go.y_4]):
+            Game.game_over()
+            RUN_GAME = False
+    except IndexError:
+        pass
     
 
 pygame.quit()
