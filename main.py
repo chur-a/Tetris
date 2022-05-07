@@ -260,27 +260,19 @@ class Z():
                     rawcube_3.append((object_packed[0],i))
                 elif Checklist_y[i] == self.y_4:
                     rawcube_4.append((object_packed[0],i))
-      
-        if len(rawcube_1) == 22:
-            self.raw_equalization(self.y_1)
-            self.raw_rect(self.y_1)
-            self.raw_eliminate(rawcube_1)
+
+        rawcomplete = False
+
+        for rawlist in [rawcube_1, rawcube_2, rawcube_3, rawcube_4]:
+            if len(rawlist) == 22:
+                self.raw_equalization(rawlist[0][1])
+                self.raw_rect(rawlist[0][1])
+                self.raw_eliminate(rawlist)
+                rawcomplete = True
+        if rawcomplete:
             return True
-        elif len(rawcube_2) == 22:
-            self.raw_equalization(self.y_2)
-            self.raw_rect(self.y_2)
-            self.raw_eliminate(rawcube_2)
-            return True
-        elif len(rawcube_3) == 22:
-            self.raw_equalization(self.y_3)
-            self.raw_rect(self.y_3)
-            self.raw_eliminate(rawcube_3)
-            return True
-        elif len(rawcube_4) == 22:
-            self.raw_equalization(self.y_4)
-            self.raw_rect(self.y_4)
-            self.raw_eliminate(rawcube_4)
-            return True
+        else:
+            return False
           
     def raw_equalization(self,mark):
         for object_packed in OBJECTS:
@@ -310,7 +302,9 @@ class Z():
                     object_packed.y_3 += 1000000
                 elif eleminate[1] == 3:
                     object_packed.y_4 += 1000000
-                    
+
+        eleminate_list.clear()
+
     def raw_rect(self,mark):
         pygame.draw.rect(SCREEN,(0,0,0),(10,mark,660,self.side_cube))
                 
@@ -435,8 +429,7 @@ class I():
                     self.x_2 -= self.side_cube
                     self.x_3 -= self.side_cube
                     self.x_4 -= self.side_cube
-                
-    
+
     def act(self):
         self.show()
         self.check()
@@ -569,27 +562,19 @@ class I():
                     rawcube_3.append((object_packed[0],i))
                 elif Checklist_y[i] == self.y_4:
                     rawcube_4.append((object_packed[0],i))
-      
-        if len(rawcube_1) == 22:
-            self.raw_equalization(self.y_1)
-            self.raw_rect(self.y_1)
-            self.raw_eliminate(rawcube_1)
+
+        rawcomplete = False
+
+        for rawlist in [rawcube_1, rawcube_2, rawcube_3, rawcube_4]:
+            if len(rawlist) == 22:
+                self.raw_equalization(rawlist[0][1])
+                self.raw_rect(rawlist[0][1])
+                self.raw_eliminate(rawlist)
+                rawcomplete = True
+        if rawcomplete:
             return True
-        elif len(rawcube_2) == 22:
-            self.raw_equalization(self.y_2)
-            self.raw_rect(self.y_2)
-            self.raw_eliminate(rawcube_2)
-            return True
-        elif len(rawcube_3) == 22:
-            self.raw_equalization(self.y_3)
-            self.raw_rect(self.y_3)
-            self.raw_eliminate(rawcube_3)
-            return True
-        elif len(rawcube_4) == 22:
-            self.raw_equalization(self.y_4)
-            self.raw_rect(self.y_4)
-            self.raw_eliminate(rawcube_4)
-            return True
+        else:
+            return False
           
     def raw_equalization(self,mark):
         for object_packed in OBJECTS:
@@ -620,6 +605,7 @@ class I():
                 elif eleminate[1] == 3:
                     object_packed.y_4 += 1000000
 
+        eleminate_list.clear()
         
     def raw_equalizer(self,mark):
         if self.y_1 < mark:
@@ -972,27 +958,19 @@ class J():
                     rawcube_3.append((object_packed[0],i))
                 elif Checklist_y[i] == self.y_4:
                     rawcube_4.append((object_packed[0],i))
-      
-        if len(rawcube_1) == 22:
-            self.raw_equalization(self.y_1)
-            self.raw_rect(self.y_1)
-            self.raw_eliminate(rawcube_1)
+
+        rawcomplete = False
+
+        for rawlist in [rawcube_1, rawcube_2, rawcube_3, rawcube_4]:
+            if len(rawlist) == 22:
+                self.raw_equalization(rawlist[0][1])
+                self.raw_rect(rawlist[0][1])
+                self.raw_eliminate(rawlist)
+                rawcomplete = True
+        if rawcomplete:
             return True
-        elif len(rawcube_2) == 22:
-            self.raw_equalization(self.y_2)
-            self.raw_rect(self.y_2)
-            self.raw_eliminate(rawcube_2)
-            return True
-        elif len(rawcube_3) == 22:
-            self.raw_equalization(self.y_3)
-            self.raw_rect(self.y_3)
-            self.raw_eliminate(rawcube_3)
-            return True
-        elif len(rawcube_4) == 22:
-            self.raw_equalization(self.y_4)
-            self.raw_rect(self.y_4)
-            self.raw_eliminate(rawcube_4)
-            return True
+        else:
+            return False
             
     def raw_equalization(self,mark):
         for object_packed in OBJECTS:
@@ -1023,6 +1001,7 @@ class J():
                 elif eleminate[1] == 3:
                     object_packed.y_4 += 1000000
 
+        eleminate_list.clear()
         
     def raw_equalizer(self,mark):
         if self.y_1 < mark:
@@ -1276,27 +1255,19 @@ class S():
                     rawcube_3.append((object_packed[0],i))
                 elif Checklist_y[i] == self.y_4:
                     rawcube_4.append((object_packed[0],i))
-      
-        if len(rawcube_1) == 22:
-            self.raw_equalization(self.y_1)
-            self.raw_rect(self.y_1)
-            self.raw_eliminate(rawcube_1)
+
+        rawcomplete = False
+
+        for rawlist in [rawcube_1, rawcube_2, rawcube_3, rawcube_4]:
+            if len(rawlist) == 22:
+                self.raw_equalization(rawlist[0][1])
+                self.raw_rect(rawlist[0][1])
+                self.raw_eliminate(rawlist)
+                rawcomplete = True
+        if rawcomplete:
             return True
-        elif len(rawcube_2) == 22:
-            self.raw_equalization(self.y_2)
-            self.raw_rect(self.y_2)
-            self.raw_eliminate(rawcube_2)
-            return True
-        elif len(rawcube_3) == 22:
-            self.raw_equalization(self.y_3)
-            self.raw_rect(self.y_3)
-            self.raw_eliminate(rawcube_3)
-            return True
-        elif len(rawcube_4) == 22:
-            self.raw_equalization(self.y_4)
-            self.raw_rect(self.y_4)
-            self.raw_eliminate(rawcube_4)
-            return True
+        else:
+            return False
             
     def raw_equalization(self, mark):
         for object_packed in OBJECTS:
@@ -1326,6 +1297,8 @@ class S():
                     object_packed.y_3 += 1000000
                 elif eleminate[1] == 3:
                     object_packed.y_4 += 1000000
+
+        eleminate_list.clear()
 
     def raw_equalizer(self, mark):
         if self.y_1 < mark:
@@ -1646,26 +1619,18 @@ class T():
                 elif Checklist_y[i] == self.y_4:
                     rawcube_4.append((object_packed[0], i))
 
-        if len(rawcube_1) == 22:
-            self.raw_equalization(self.y_1)
-            self.raw_rect(self.y_1)
-            self.raw_eliminate(rawcube_1)
+        rawcomplete = False
+
+        for rawlist in [rawcube_1, rawcube_2, rawcube_3, rawcube_4]:
+            if len(rawlist) == 22:
+                self.raw_equalization(rawlist[0][1])
+                self.raw_rect(rawlist[0][1])
+                self.raw_eliminate(rawlist)
+                rawcomplete = True
+        if rawcomplete:
             return True
-        elif len(rawcube_2) == 22:
-            self.raw_equalization(self.y_2)
-            self.raw_rect(self.y_2)
-            self.raw_eliminate(rawcube_2)
-            return True
-        elif len(rawcube_3) == 22:
-            self.raw_equalization(self.y_3)
-            self.raw_rect(self.y_3)
-            self.raw_eliminate(rawcube_3)
-            return True
-        elif len(rawcube_4) == 22:
-            self.raw_equalization(self.y_4)
-            self.raw_rect(self.y_4)
-            self.raw_eliminate(rawcube_4)
-            return True
+        else:
+            return False
 
     def raw_equalization(self, mark):
         for object_packed in OBJECTS:
@@ -1695,6 +1660,8 @@ class T():
                     object_packed.y_3 += 1000000
                 elif eleminate[1] == 3:
                     object_packed.y_4 += 1000000
+
+        eleminate_list.clear()
 
     def raw_equalizer(self, mark):
         if self.y_1 < mark:
@@ -2028,26 +1995,18 @@ class L():
                 elif Checklist_y[i] == self.y_4:
                     rawcube_4.append((object_packed[0], i))
 
-        if len(rawcube_1) == 22:
-            self.raw_equalization(self.y_1)
-            self.raw_rect(self.y_1)
-            self.raw_eliminate(rawcube_1)
+        rawcomplete = False
+
+        for rawlist in [rawcube_1, rawcube_2, rawcube_3, rawcube_4]:
+            if len(rawlist) == 22:
+                self.raw_equalization(rawlist[0][1])
+                self.raw_rect(rawlist[0][1])
+                self.raw_eliminate(rawlist)
+                rawcomplete = True
+        if rawcomplete:
             return True
-        elif len(rawcube_2) == 22:
-            self.raw_equalization(self.y_2)
-            self.raw_rect(self.y_2)
-            self.raw_eliminate(rawcube_2)
-            return True
-        elif len(rawcube_3) == 22:
-            self.raw_equalization(self.y_3)
-            self.raw_rect(self.y_3)
-            self.raw_eliminate(rawcube_3)
-            return True
-        elif len(rawcube_4) == 22:
-            self.raw_equalization(self.y_4)
-            self.raw_rect(self.y_4)
-            self.raw_eliminate(rawcube_4)
-            return True
+        else:
+            return False
 
     def raw_equalization(self, mark):
         for object_packed in OBJECTS:
@@ -2077,6 +2036,8 @@ class L():
                     object_packed.y_3 += 1000000
                 elif eleminate[1] == 3:
                     object_packed.y_4 += 1000000
+
+        eleminate_list.clear()
 
     def raw_equalizer(self, mark):
         if self.y_1 < mark:
@@ -2235,26 +2196,20 @@ class O():
                 elif Checklist_y[i] == self.y_4:
                     rawcube_4.append((object_packed[0], i))
 
-        if len(rawcube_1) == 22:
-            self.raw_equalization(self.y_1)
-            self.raw_rect(self.y_1)
-            self.raw_eliminate(rawcube_1)
+        rawcomplete = False
+
+        for rawlist in sorted([rawcube_1, rawcube_2, rawcube_3, rawcube_4], key=lambda item: item[0][1]):
+            if len(rawlist) == 22:
+                self.raw_equalization(rawlist[0][1])
+                self.raw_rect(rawlist[0][1])
+                self.raw_eliminate(rawlist)
+                self.raw_show()
+                Game.score += 10
+                rawcomplete = True
+        if rawcomplete:
             return True
-        elif len(rawcube_2) == 22:
-            self.raw_equalization(self.y_2)
-            self.raw_rect(self.y_2)
-            self.raw_eliminate(rawcube_2)
-            return True
-        elif len(rawcube_3) == 22:
-            self.raw_equalization(self.y_3)
-            self.raw_rect(self.y_3)
-            self.raw_eliminate(rawcube_3)
-            return True
-        elif len(rawcube_4) == 22:
-            self.raw_equalization(self.y_4)
-            self.raw_rect(self.y_4)
-            self.raw_eliminate(rawcube_4)
-            return True
+        else:
+            return False
 
     def raw_equalization(self, mark):
         for object_packed in OBJECTS:
@@ -2285,6 +2240,8 @@ class O():
                 elif eleminate[1] == 3:
                     object_packed.y_4 += 1000000
 
+        eleminate_list.clear()
+
     def raw_equalizer(self, mark):
         if self.y_1 < mark:
             self.y_1 += self.side_cube
@@ -2298,23 +2255,41 @@ class O():
     def raw_rect(self, mark):
         pygame.draw.rect(SCREEN, (0, 0, 0), (10, mark, 660, self.side_cube))
 
+    def raw_show(self):
+        shell = Shell()
+        shell.draw_line()
+        shell.draw_rect()
+        objec_wait.wait()
+        Game.blit_score_table((740, 800))
+        pygame.display.update()
+        pygame.time.wait(2000)
 
 class GameTools():
 
     def __init__(self):
-        self.font = pygame.font.Font("assets/Font/tahoma.ttf", 24)
+        self.font = FONT
         self.font.set_bold(True)
-        self.time = pygame.time.get_ticks() // 1000
+        self.time = 0
         self.fps = round(CLOCK.get_fps())
         self.score = 0
+        self.pause = True
+        self.black = (0, 0, 0)
 
     def blit_score_table(self, pos: tuple):
         x, y = pos
-        black = (0, 0, 0)
-        score_table = (self.font.render('Time: {}'.format(self.time), True, black),
-                       self.font.render('FPS: {}'.format(self.fps), True, black),
-                       self.font.render('Score: {}'.format(self.score), True, black))
+        score_table = (self.font.render('Time: {}'.format(self.time // 1000), True, self.black),
+                       self.font.render('FPS: {}'.format(self.fps), True, self.black),
+                       self.font.render('Score: {}'.format(self.score), True, self.black))
         for line_surface in score_table:
+            SCREEN.blit(line_surface, (x, y))
+            height_line = line_surface.get_height()
+            y += height_line
+
+    def blit_control_table(self, pos: tuple):
+        x, y = pos
+        control_table = (self.font.render('Turn: SPACE', True, self.black),
+                         self.font.render('Pause: ENTER', True, self.black))
+        for line_surface in control_table:
             SCREEN.blit(line_surface, (x, y))
             height_line = line_surface.get_height()
             y += height_line
@@ -2326,20 +2301,35 @@ class GameTools():
         return False
 
     def game_over(self):
-            pause = True
-            black = (0, 0, 0)
-            while pause:
-                SCREEN.fill((255, 255, 255))
-                game_over_text = self.font.render('GAME OVER', True, black)
-                final_score_text = self.font.render('Your Score: {}'.format(self.score), True, black)
-                raw_height = game_over_text.get_height()
-                raw_width = game_over_text.get_width()
-                x, y = (WIDTH // 2 - raw_width // 2, HEIGHT // 2 - raw_height)
-                SCREEN.blit(game_over_text, (x, y))
-                SCREEN.blit(final_score_text, (x, y + raw_height))
-                pygame.display.update()
-                if pygame.event.peek(pygame.QUIT):
-                    pause = False
+        while self.pause:
+            SCREEN.fill((255, 255, 255))
+            game_over_text = self.font.render('GAME OVER', True, self.black)
+            final_score_text = self.font.render('Your Score: {}'.format(self.score), True, self.black)
+            raw_height = game_over_text.get_height()
+            raw_width = game_over_text.get_width()
+            x, y = (WIDTH // 2 - raw_width // 2, HEIGHT // 2 - raw_height)
+            SCREEN.blit(game_over_text, (x, y))
+            SCREEN.blit(final_score_text, (x, y + raw_height))
+            pygame.display.update()
+            if pygame.event.peek(pygame.QUIT):
+                self.pause = False
+        self.pause = True
+
+    def game_pause(self):
+        while self.pause:
+            CLOCK.tick(20)
+            game_pause_text = self.font.render('GAME IS PAUSED', True, self.black)
+            unpause_text = self.font.render('Press ENTER to unpause', True, self.black)
+            raw_height = game_pause_text.get_height()
+            raw_width = unpause_text.get_width()
+            x, y = (WIDTH // 2 - raw_width // 2, HEIGHT // 2 - raw_height)
+            SCREEN.blit(game_pause_text, (x, y))
+            SCREEN.blit(unpause_text, (x, y + raw_height))
+            pygame.display.update()
+            for event in pygame.event.get(eventtype=pygame.KEYUP):
+                if event.key == pygame.K_RETURN:
+                    self.pause = False
+        self.pause = True
 
 
 
@@ -2351,6 +2341,7 @@ SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
 RUN_GAME = True
 CLOCK = pygame.time.Clock()
 OBJECTS = []
+FONT = pygame.font.Font("assets/Font/tahoma.ttf", 24)
 
 Game = GameTools()
 objec = I(310, -4, (40, 25, 77))
@@ -2359,7 +2350,11 @@ objec_wait = Z(310, -4, (174, 122, 14))
 
 while RUN_GAME:
     SCREEN.fill((255, 255, 255))
-    CLOCK.tick(20)
+
+    Game.time += CLOCK.tick(20)
+    Game.fps = round(CLOCK.get_fps())
+    Game.blit_score_table((740, 800))
+    Game.blit_control_table((740, 500))
     pygame.event.pump()
 
     if not objec.stop():
@@ -2389,15 +2384,15 @@ while RUN_GAME:
 
     for objec_packed in OBJECTS:
         objec_packed.show()
+
+    for event in pygame.event.get(eventtype=pygame.KEYUP):
+        if event.key == pygame.K_RETURN:
+            Game.game_pause()
     
     if pygame.event.peek(pygame.QUIT):
         RUN_GAME = False
     
     pygame.event.clear(eventtype=pygame.KEYDOWN)
-
-    Game.time = pygame.time.get_ticks() // 1000
-    Game.fps = round(CLOCK.get_fps())
-    Game.blit_score_table((740, 800))
 
     pygame.display.update()
 
