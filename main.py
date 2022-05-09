@@ -2274,22 +2274,21 @@ class GameTools():
         self.score = 0
         self.pause = True
         self.black = (0, 0, 0)
+        self.score_table = (self.font.render('Time: {}'.format(self.time // 1000), True, self.black),
+                            self.font.render('FPS: {}'.format(self.fps), True, self.black),
+                            self.font.render('Score: {}'.format(self.score), True, self.black))
+        self.control_table = (self.font.render('Turn: SPACE', True, self.black),
+                              self.font.render('Pause: ENTER', True, self.black))
+        self.game_over_table = (self.font.render('GAME OVER', True, self.black),
+                                self.font.render('Your Score: {}'.format(self.score), True, self.black),
+                                self.font.render('Press ENTER to start a new game', True, self.black),
+                                self.font.render('Press ESC to exit', True, self.black))
+        self.paused_table = (self.font.render('GAME IS PAUSED', True, self.black),
+                             self.font.render('Press ENTER to unpause', True, self.black))
 
-    def blit_score_table(self, pos: tuple):
+    def blit_table(self, pos: tuple, table):
         x, y = pos
-        score_table = (self.font.render('Time: {}'.format(self.time // 1000), True, self.black),
-                       self.font.render('FPS: {}'.format(self.fps), True, self.black),
-                       self.font.render('Score: {}'.format(self.score), True, self.black))
-        for line_surface in score_table:
-            SCREEN.blit(line_surface, (x, y))
-            height_line = line_surface.get_height()
-            y += height_line
-
-    def blit_control_table(self, pos: tuple):
-        x, y = pos
-        control_table = (self.font.render('Turn: SPACE', True, self.black),
-                         self.font.render('Pause: ENTER', True, self.black))
-        for line_surface in control_table:
+        for line_surface in table:
             SCREEN.blit(line_surface, (x, y))
             height_line = line_surface.get_height()
             y += height_line
@@ -2300,37 +2299,21 @@ class GameTools():
                 return True
         return False
 
-    def game_over(self):
-        while self.pause:
-            SCREEN.fill((255, 255, 255))
-            game_over_text = self.font.render('GAME OVER', True, self.black)
-            final_score_text = self.font.render('Your Score: {}'.format(self.score), True, self.black)
-            raw_height = game_over_text.get_height()
-            raw_width = game_over_text.get_width()
-            x, y = (WIDTH // 2 - raw_width // 2, HEIGHT // 2 - raw_height)
-            SCREEN.blit(game_over_text, (x, y))
-            SCREEN.blit(final_score_text, (x, y + raw_height))
-            pygame.display.update()
-            if pygame.event.peek(pygame.QUIT):
-                self.pause = False
-        self.pause = True
-
-    def game_pause(self):
+    def game_stop(self, table):
         while self.pause:
             CLOCK.tick(20)
-            game_pause_text = self.font.render('GAME IS PAUSED', True, self.black)
-            unpause_text = self.font.render('Press ENTER to unpause', True, self.black)
-            raw_height = game_pause_text.get_height()
-            raw_width = unpause_text.get_width()
+            raw_height = table[0].get_height()
+            raw_width = table[0].get_width()
             x, y = (WIDTH // 2 - raw_width // 2, HEIGHT // 2 - raw_height)
-            SCREEN.blit(game_pause_text, (x, y))
-            SCREEN.blit(unpause_text, (x, y + raw_height))
+            for line in table:
+                SCREEN.blit(line, (x, y))
+                y += line.get_height()
             pygame.display.update()
             for event in pygame.event.get(eventtype=pygame.KEYUP):
                 if event.key == pygame.K_RETURN:
-                    self.pause = False
-        self.pause = True
-
+                    return False
+                if event.key == pygame.K_ESCAPE:
+                    return True
 
 
 pygame.init()
@@ -2353,8 +2336,11 @@ while RUN_GAME:
 
     Game.time += CLOCK.tick(20)
     Game.fps = round(CLOCK.get_fps())
-    Game.blit_score_table((740, 800))
-    Game.blit_control_table((740, 500))
+    Game.score_table = (Game.font.render('Time: {}'.format(Game.time // 1000), True, Game.black),
+                        Game.font.render('FPS: {}'.format(Game.fps), True, Game.black),
+                        Game.font.render('Score: {}'.format(Game.score), True, Game.black))
+    Game.blit_table((740, 800), Game.score_table)
+    Game.blit_table((740, 500), Game.control_table)
     pygame.event.pump()
 
     if not objec.stop():
@@ -2366,7 +2352,7 @@ while RUN_GAME:
             shell.draw_line()
             shell.draw_rect()
             objec_wait.wait()
-            Game.blit_score_table((740, 800))
+            Game.blit_table((740, 800), Game.score_table)
             pygame.display.update()
             pygame.time.wait(2000)
             Game.score += 10
@@ -2387,20 +2373,27 @@ while RUN_GAME:
 
     for event in pygame.event.get(eventtype=pygame.KEYUP):
         if event.key == pygame.K_RETURN:
-            Game.game_pause()
+            Game.game_stop(Game.paused_table)
     
     if pygame.event.peek(pygame.QUIT):
         RUN_GAME = False
-    
-    pygame.event.clear(eventtype=pygame.KEYDOWN)
+
 
     pygame.display.update()
 
     try:
         object_check_go = OBJECTS[-1]
         if Game.game_over_check([object_check_go.y_1, object_check_go.y_2, object_check_go.y_3, object_check_go.y_4]):
-            Game.game_over()
-            RUN_GAME = False
+            SCREEN.fill((255, 255, 255))
+            Game.game_over_table = (Game.font.render('GAME OVER', True, Game.black),
+                                    Game.font.render('Your Score: {}'.format(Game.score), True, Game.black),
+                                    Game.font.render('Press ENTER to start a new game', True, Game.black),
+                                    Game.font.render('Press ESC to exit', True, Game.black))
+            if Game.game_stop(Game.game_over_table):
+                RUN_GAME = False
+            else:
+                OBJECTS.clear()
+                Game.score = Game.time = 0
     except IndexError:
         pass
     
