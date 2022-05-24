@@ -134,38 +134,37 @@ class Figures(Shell):
 
     def equalization(self, level, cube_level):
         diff = cube_level + self.side_cube - level
-        for y in [self.y_1, self.y_2, self.y_3, self.y_4]:
-            y -= diff
+        self.y_1 -= diff
+        self.y_2 -= diff
+        self.y_3 -= diff
+        self.y_4 -= diff
 
-    def raw(self):  #FIXME
-        rawcube_1 = rawcube_2 = rawcube_3 = rawcube_4 = []
+    def raw(self):
+        Y = [('self1', self.y_1), ('self2', self.y_2), ('self3', self.y_3), ('self4', self.y_4)]
+        Raws = [[] for _ in range(4)]
+        for y in Y:
+            for raw in Raws:
+                if not raw or y[1] == raw[0][1]:
+                    raw.append(y)
+                    break
+
         for object_packed in enumerate(OBJECTS):
             Checklist_y = [object_packed[1].y_1, object_packed[1].y_2, object_packed[1].y_3, object_packed[1].y_4]
             for i in range(len(Checklist_y)):
-                if Checklist_y[i] == self.y_1:
-                    rawcube_1.append((object_packed[0], i))
-                elif Checklist_y[i] == self.y_2:
-                    rawcube_2.append((object_packed[0], i))
-                elif Checklist_y[i] == self.y_3:
-                    rawcube_3.append((object_packed[0], i))
-                elif Checklist_y[i] == self.y_4:
-                    rawcube_4.append((object_packed[0], i))
+                for raw in Raws:
+                    if raw and Checklist_y[i] == raw[0][1]:
+                        raw.append((object_packed[0], i))
+                        break
+                    if not raw:
+                        raw.append(('MAX', float('inf')))
 
-        rawcomplete = False
-
-        for rawlist in sorted([rawcube_1, rawcube_2, rawcube_3, rawcube_4],
-                              key=lambda item: item[0][1]):
+        for rawlist in sorted(Raws, key=lambda item: item[0][1]):
             if len(rawlist) == 22:
                 self.raw_equalization(rawlist[0][1])
                 self.raw_rect(rawlist[0][1])
                 self.raw_eliminate(rawlist)
                 self.raw_show()
                 Game.score += 10
-                rawcomplete = True
-        if rawcomplete:
-            return True
-        else:
-            return False
 
     def raw_equalization(self, mark):
         for object_packed in OBJECTS:
@@ -215,7 +214,10 @@ class Figures(Shell):
         self.draw_line()
         self.draw_rect()
         objec_wait.wait()
-        Game.blit_score_table((740, 800))
+        Game.score_table = (Game.font.render('Time: {}'.format(Game.time // 1000), True, Game.black),
+                            Game.font.render('FPS: {}'.format(Game.fps), True, Game.black),
+                            Game.font.render('Score: {}'.format(Game.score), True, Game.black))
+        Game.blit_table((740, 800), Game.score_table)
         pygame.display.update()
         pygame.time.wait(2000)
 
@@ -318,7 +320,7 @@ class I(Figures):
             elif self.position == 0:
                 for cube in enumerate(Checklist_x):
                     if ((self.x_2 == cube[1] and not self.left_boarder) or (self.x_1 == cube[1] and self.left_boarder) or
-                        (self.x_4 == cube[1] and self.right_boarder)):
+                          (self.x_4 == cube[1] and self.right_boarder)):
                         if Checklist_y[cube[0]] <= self.y_2 - self.side_cube <= Checklist_y[cube[0]] + self.side_cube:
                             return True
                         if Checklist_y[cube[0]] <= self.y_2 + self.side_cube <= Checklist_y[cube[0]] + self.side_cube:
@@ -334,7 +336,7 @@ class I(Figures):
         else:
             return False
     
-    def turn(self):
+    def turn(self):#FIXME
         for event in pygame.event.get(eventtype=pygame.KEYDOWN):
             if event.key == pygame.K_SPACE and self.position == 1:
                 self.y_1 = self.y_3 = self.y_4 = self.y_2
@@ -751,6 +753,10 @@ class O(Figures):
         self.x_wait = self.draw_rect()[0] + WIDTH_RECT // 2
         self.y_wait = self.draw_rect()[1] + HEIGHT_RECT // 2
 
+    def turn_disable(self):
+        return True
+
+
 
 class GameTools():
 
@@ -841,15 +847,7 @@ while RUN_GAME:
         objec.act()
         objec_wait.wait()
     else:
-        if objec.raw():
-            shell = Shell()
-            shell.draw_line()
-            shell.draw_rect()
-            objec_wait.wait()
-            Game.blit_table((740, 800), Game.score_table)
-            pygame.display.update()
-            pygame.time.wait(2000)
-            Game.score += 10
+        objec.raw()
         OBJECTS.append(objec)
         objec = objec_wait
         objec_wait = random.choice([Z(310, -4, (174, 122, 14)),
