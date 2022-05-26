@@ -394,28 +394,51 @@ class J(Figures):
         self.y_wait = self.draw_rect()[1] + HEIGHT_RECT//2 - self.side_cube
             
     def turn_disable(self):
+        self.left_flag = False
+        self.right_flag = False
         for object_packed in OBJECTS:
-            Checklist_x =[object_packed.x_1,object_packed.x_2,object_packed.x_3,object_packed.x_4]
-            Checklist_y =[object_packed.y_1,object_packed.y_2,object_packed.y_3,object_packed.y_4]
-            if self.position == 1:
-                for cube in enumerate(Checklist_x):
-                    if (cube[1] in [self.x_1,self.x_3] and
-                          self.y_1 - self.side_cube < Checklist_y[cube[0]] + self.side_cube < self.y_1):
+            Checklist_x =[object_packed.x_1, object_packed.x_2, object_packed.x_3, object_packed.x_4]
+            Checklist_y =[object_packed.y_1, object_packed.y_2, object_packed.y_3, object_packed.y_4]
+            for cube in enumerate(Checklist_x):
+                if self.position == 1:
+                    if (
+                        self.check_on_cube(self.x_1, self.y_1, cube[1], Checklist_y[cube[0]]) or
+                        self.check_on_cube(self.x_1, self.y_1 - self.side_cube, cube[1], Checklist_y[cube[0]]) or
+                        self.check_on_cube(self.x_3, self.y_3 - 2*self.side_cube, cube[1], Checklist_y[cube[0]])
+                    ):
                         return True
-            elif self.position == 2:
-                for cube in enumerate(Checklist_x):
-                    if (self.y_3 - self.side_cube < Checklist_y[cube[0]] < self.y_4 + self.side_cube and
-                          cube[1] == self.x_3 + 2*self.side_cube):
+                elif self.position == 2:
+                    if (
+                        self.check_on_cube(self.x_3 + self.side_cube, self.y_3, cube[1], Checklist_y[cube[0]]) or
+                        self.check_on_cube(self.x_4 + self.side_cube, self.y_4, cube[1], Checklist_y[cube[0]])
+                    ):
+                        self.right_flag = True
+                    elif self.check_on_cube(-self.x_3, self.y_3, cube[1], Checklist_y[cube[0]]):
+                        self.left_flag = True
+                    if (
+                        (self.right_flag and self.left_flag) or
+                        self.check_on_cube(self.x_3, self.y_3, cube[1], Checklist_y[cube[0]])
+                    ):
                         return True
-            elif self.position == 3:
-                for cube in enumerate(Checklist_x):
-                    if (cube[1] == self.x_3 and
-                          self.y_3 < Checklist_y[cube[0]] - self.side_cube < self.y_3 + self.side_cube):
+                elif self.position == 3:
+                    if (
+                        self.check_on_cube(-self.x_1, self.y_1, cube[1], Checklist_y[cube[0]]) or
+                        self.check_on_cube(-(self.x_1 - self.side_cube), self.y_1, cube[1], Checklist_y[cube[0]]) or
+                        self.check_on_cube(-self.x_2, self.y_2 - self.side_cube, cube[1], Checklist_y[cube[0]])
+                    ):
                         return True
-            elif self.position == 4:
-                for cube in enumerate(Checklist_x):
-                    if (self.y_2 - self.side_cube < Checklist_y[cube[0]] < self.y_2 + self.side_cube and
-                          cube[1] == self.x_2 + self.side_cube):
+                elif self.position == 4:
+                    if self.check_on_cube(self.x_2, self.y_2, cube[1], Checklist_y[cube[0]]):
+                        self.right_flag = True
+                    elif (
+                          self.check_on_cube(-self.x_1, self.y_1, cube[1], Checklist_y[cube[0]]) or
+                          self.check_on_cube(-self.x_1, self.y_1 - self.side_cube, cube[1], Checklist_y[cube[0]])
+                    ):
+                        self.left_flag = True
+                    if (
+                        (self.left_flag and self.right_flag) or
+                        self.check_on_cube(-self.x_3, self.y_3, cube[1], Checklist_y[cube[0]])
+                    ):
                         return True
         return False
     
@@ -451,6 +474,15 @@ class J(Figures):
                 self.x_4 += self.side_cube
                 self.y_4 += 2*self.side_cube
                 self.position = 1
+            self.turn_adjustments(self.right_flag, event)
+
+    def turn_adjustments(self, right_flag, event):
+        if event.key == pygame.K_SPACE:
+            if right_flag or self.x_3 + 2*self.side_cube > self.draw_line():
+                self.x_1 -= self.side_cube
+                self.x_2 -= self.side_cube
+                self.x_3 -= self.side_cube
+                self.x_4 -= self.side_cube
 
 
 class S(Figures):
@@ -565,57 +597,50 @@ class T(Figures):
                 self.y_1 += self.side_cube
                 self.y_2 = self.y_4 = self.y_3
                 self.position = 1
-            self.turn_adjustments(self.left_flag, self.right_flag, event)
+            self.turn_adjustments(self.right_flag, event)
 
-    def turn_adjustments(self, left_flag, right_flag, event):
+    def turn_adjustments(self, right_flag, event):
         if event.key == pygame.K_SPACE:
-            shell = Shell()
-            if right_flag and self.position != 4 or self.x_1 + 2*self.side_cube > shell.draw_line():
+            if right_flag or self.x_1 + 2*self.side_cube > self.draw_line():
                 self.x_1 -= self.side_cube
                 self.x_2 -= self.side_cube
                 self.x_3 -= self.side_cube
                 self.x_4 -= self.side_cube
-            if left_flag and self.position != 1:
-                self.x_1 += self.side_cube
-                self.x_2 += self.side_cube
-                self.x_3 += self.side_cube
-                self.x_4 += self.side_cube
 
     def turn_disable(self):
         self.left_flag = False
         self.right_flag = False
         for object_packed in OBJECTS:
-            Checklist_x = [object_packed.x_1,object_packed.x_2,object_packed.x_3,object_packed.x_4]
-            Checklist_y = [object_packed.y_1,object_packed.y_2,object_packed.y_3,object_packed.y_4]
+            Checklist_x = [object_packed.x_1, object_packed.x_2, object_packed.x_3, object_packed.x_4]
+            Checklist_y = [object_packed.y_1, object_packed.y_2, object_packed.y_3, object_packed.y_4]
             for cube in enumerate(Checklist_x):
                 if self.position == 1:
                     if (Checklist_y[cube[0]] <= self.y_3 - self.side_cube < Checklist_y[cube[0]] + self.side_cube and
                     cube[1] == self.x_3):
                         return True
                 elif self.position == 2:
-                    if self.check_on_cube(self.x_4,self.y_4,cube[1],Checklist_y[cube[0]]):
+                    if self.check_on_cube(self.x_4, self.y_4, cube[1], Checklist_y[cube[0]]):
                         self.right_flag = True
-                    elif self.check_on_cube(-self.x_4,self.y_4,cube[1],Checklist_y[cube[0]]):
+                    elif self.check_on_cube(-(self.x_4-self.side_cube), self.y_4, cube[1], Checklist_y[cube[0]]):
                         self.left_flag = True
-                    if self.left_flag and self.right_flag:
+                    if (
+                        (self.left_flag and self.right_flag) or
+                        self.check_on_cube(-self.x_4, self.y_4, cube[1], Checklist_y[cube[0]])
+                    ):
                         return True
                 elif self.position == 3:
                     if (
-                        self.check_on_cube(-self.x_1,self.y_1-self.side_cube,cube[1],Checklist_y[cube[0]]) or
-                        self.check_on_cube(-self.x_1,self.y_1,cube[1],Checklist_y[cube[0]])
+                        self.check_on_cube(-self.x_1, self.y_1-self.side_cube,cube[1],Checklist_y[cube[0]]) or
+                        self.check_on_cube(-self.x_1, self.y_1, cube[1],Checklist_y[cube[0]])
                     ):
-                        self.left_flag = True
-                    elif self.check_on_cube(self.x_1,self.y_1,cube[1],Checklist_y[cube[0]]):
-                        self.right_flag = True
-                    if self.left_flag and self.right_flag:
                         return True
                 elif self.position == 4:
                     if (
-                        self.check_on_cube(self.x_1,self.y_1,cube[1],Checklist_y[cube[0]]) or
-                        self.check_on_cube(self.x_2,self.y_2,cube[1],Checklist_y[cube[0]])
+                        self.check_on_cube(self.x_1, self.y_1, cube[1], Checklist_y[cube[0]]) or
+                        self.check_on_cube(self.x_2, self.y_2, cube[1], Checklist_y[cube[0]])
                     ):
                         self.right_flag = True
-                    elif self.check_on_cube(-self.x_3,self.y_3,cube[1],Checklist_y[cube[0]]):
+                    elif self.check_on_cube(-self.x_3, self.y_3, cube[1], Checklist_y[cube[0]]):
                         self.left_cube = True
                     if self.right_flag and self.left_flag:
                         return True
@@ -675,11 +700,10 @@ class L(Figures):
 
     def turn_adjustments(self, right_flag, event):
         if event.key == pygame.K_SPACE:
-            shell = Shell()
             if (
-                right_flag and self.position in [2, 4] or
-                self.x_1 + 2*self.side_cube > shell.draw_line() or
-                self.x_4 + 2*self.side_cube > shell.draw_line()
+                right_flag or
+                self.x_1 + 2*self.side_cube > self.draw_line() or
+                self.x_4 + 2*self.side_cube > self.draw_line()
             ):
                 self.x_1 -= self.side_cube
                 self.x_2 -= self.side_cube
@@ -757,7 +781,6 @@ class O(Figures):
         return True
 
 
-
 class GameTools():
 
     def __init__(self):
@@ -772,13 +795,15 @@ class GameTools():
                             self.font.render('FPS: {}'.format(self.fps), True, self.black),
                             self.font.render('Score: {}'.format(self.score), True, self.black))
         self.control_table = (self.font.render('Turn: SPACE', True, self.black),
-                              self.font.render('Pause: ENTER', True, self.black))
+                              self.font.render('Pause: ENTER', True, self.black),
+                              self.font.render('Exit: ESC', True, self.black))
         self.game_over_table = (self.font.render('GAME OVER', True, self.black),
                                 self.font.render('Your Score: {}'.format(self.score), True, self.black),
                                 self.font.render('Press ENTER to start a new game', True, self.black),
                                 self.font.render('Press ESC to exit', True, self.black))
         self.paused_table = (self.font.render('GAME IS PAUSED', True, self.black),
-                             self.font.render('Press ENTER to unpause', True, self.black))
+                             self.font.render('Press ENTER to unpause', True, self.black),
+                             self.font.render('Press ESC to exit', True, self.black))
 
     def blit_table(self, pos: tuple, table):
         x, y = pos
@@ -798,16 +823,16 @@ class GameTools():
             CLOCK.tick(20)
             raw_height = table[0].get_height()
             raw_width = table[0].get_width()
-            x, y = (WIDTH // 2 - raw_width // 2, HEIGHT // 2 - raw_height)
+            x, y = (WIDTH // 2 - raw_width // 2 - 50, HEIGHT // 2 - raw_height)
             for line in table:
                 SCREEN.blit(line, (x, y))
                 y += line.get_height()
             pygame.display.update()
-            for event in pygame.event.get(eventtype=pygame.KEYUP):
-                if event.key == pygame.K_RETURN:
-                    return False
-                if event.key == pygame.K_ESCAPE:
+            for event in pygame.event.get(eventtype=(pygame.KEYUP, pygame.QUIT)):
+                if (event.type == pygame.QUIT or event.key == pygame.K_ESCAPE):
                     return True
+                elif event.key == pygame.K_RETURN:
+                    return False
 
 
 pygame.init()
@@ -863,13 +888,12 @@ while RUN_GAME:
     for objec_packed in OBJECTS:
         objec_packed.show()
 
-    for event in pygame.event.get(eventtype=pygame.KEYUP):
-        if event.key == pygame.K_RETURN:
-            Game.game_stop(Game.paused_table)
-    
-    if pygame.event.peek(pygame.QUIT):
-        RUN_GAME = False
-
+    for event in pygame.event.get(eventtype=(pygame.KEYUP, pygame.QUIT)):
+        if event.type == pygame.QUIT or event.key == pygame.K_ESCAPE:
+            RUN_GAME = False
+        elif event.key == pygame.K_RETURN:
+            if Game.game_stop(Game.paused_table):
+                RUN_GAME = False
 
     pygame.display.update()
 
@@ -888,6 +912,6 @@ while RUN_GAME:
                 Game.score = Game.time = 0
     except IndexError:
         pass
-    
+
 
 pygame.quit()
