@@ -155,10 +155,8 @@ class Figures(Shell):
                     if raw and Checklist_y[i] == raw[0][1]:
                         raw.append((object_packed[0], i))
                         break
-                    if not raw:
-                        raw.append(('MAX', float('inf')))
 
-        for rawlist in sorted(Raws, key=lambda item: item[0][1]):
+        for rawlist in sorted((raw for raw in Raws if raw), key=lambda item: item[0][1]):
             if len(rawlist) == 22:
                 self.raw_equalization(rawlist[0][1])
                 self.raw_rect(rawlist[0][1])
@@ -214,9 +212,6 @@ class Figures(Shell):
         self.draw_line()
         self.draw_rect()
         objec_wait.wait()
-        Game.score_table = (Game.font.render('Time: {}'.format(Game.time // 1000), True, Game.black),
-                            Game.font.render('FPS: {}'.format(Game.fps), True, Game.black),
-                            Game.font.render('Score: {}'.format(Game.score), True, Game.black))
         Game.blit_table((740, 800), Game.score_table)
         pygame.display.update()
         pygame.time.wait(2000)
@@ -781,7 +776,7 @@ class O(Figures):
         return True
 
 
-class GameTools():
+class GameTools:
 
     def __init__(self):
         self.font = FONT
@@ -791,19 +786,25 @@ class GameTools():
         self.score = 0
         self.pause = True
         self.black = (0, 0, 0)
-        self.score_table = (self.font.render('Time: {}'.format(self.time // 1000), True, self.black),
-                            self.font.render('FPS: {}'.format(self.fps), True, self.black),
-                            self.font.render('Score: {}'.format(self.score), True, self.black))
         self.control_table = (self.font.render('Turn: SPACE', True, self.black),
                               self.font.render('Pause: ENTER', True, self.black),
                               self.font.render('Exit: ESC', True, self.black))
-        self.game_over_table = (self.font.render('GAME OVER', True, self.black),
-                                self.font.render('Your Score: {}'.format(self.score), True, self.black),
-                                self.font.render('Press ENTER to start a new game', True, self.black),
-                                self.font.render('Press ESC to exit', True, self.black))
         self.paused_table = (self.font.render('GAME IS PAUSED', True, self.black),
                              self.font.render('Press ENTER to unpause', True, self.black),
                              self.font.render('Press ESC to exit', True, self.black))
+
+    @property
+    def score_table(self):
+        return (self.font.render('Time: {}'.format(self.time // 1000), True, self.black),
+                self.font.render('FPS: {}'.format(self.fps), True, self.black),
+                self.font.render('Score: {}'.format(self.score), True, self.black))
+
+    @property
+    def game_over_table(self):
+        return (self.font.render('GAME OVER', True, self.black),
+                self.font.render('Your Score: {}'.format(self.score), True, self.black),
+                self.font.render('Press ENTER to start a new game', True, self.black),
+                self.font.render('Press ESC to exit', True, self.black))
 
     def blit_table(self, pos: tuple, table):
         x, y = pos
@@ -829,7 +830,7 @@ class GameTools():
                 y += line.get_height()
             pygame.display.update()
             for event in pygame.event.get(eventtype=(pygame.KEYUP, pygame.QUIT)):
-                if (event.type == pygame.QUIT or event.key == pygame.K_ESCAPE):
+                if event.type == pygame.QUIT or event.key == pygame.K_ESCAPE:
                     return True
                 elif event.key == pygame.K_RETURN:
                     return False
@@ -861,9 +862,6 @@ while RUN_GAME:
 
     Game.time += CLOCK.tick(20)
     Game.fps = round(CLOCK.get_fps())
-    Game.score_table = (Game.font.render('Time: {}'.format(Game.time // 1000), True, Game.black),
-                        Game.font.render('FPS: {}'.format(Game.fps), True, Game.black),
-                        Game.font.render('Score: {}'.format(Game.score), True, Game.black))
     Game.blit_table((740, 800), Game.score_table)
     Game.blit_table((740, 500), Game.control_table)
     pygame.event.pump()
@@ -901,10 +899,6 @@ while RUN_GAME:
         object_check_go = OBJECTS[-1]
         if Game.game_over_check([object_check_go.y_1, object_check_go.y_2, object_check_go.y_3, object_check_go.y_4]):
             SCREEN.fill((255, 255, 255))
-            Game.game_over_table = (Game.font.render('GAME OVER', True, Game.black),
-                                    Game.font.render('Your Score: {}'.format(Game.score), True, Game.black),
-                                    Game.font.render('Press ENTER to start a new game', True, Game.black),
-                                    Game.font.render('Press ESC to exit', True, Game.black))
             if Game.game_stop(Game.game_over_table):
                 RUN_GAME = False
             else:
