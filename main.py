@@ -335,17 +335,20 @@ class I(Figures):
                 for check_x, check_y in zip(Checklist_x, Checklist_y):
                     if (
                         (
+                         (
                             (self.x_2 == check_x and not self.left_boarder) or
                             (self.x_1 == check_x and self.left_boarder) or
                             (self.x_4 == check_x and self.right_boarder)
-                        ) and
-                        (
+                         ) and
+                         (
                             check_y <= self.y_2 - self.side_cube <= check_y + self.side_cube
                             or
                             check_y <= self.y_2 + self.side_cube <= check_y + self.side_cube
                             or
                             check_y <= self.y_2 + 2*self.side_cube <= check_y + self.side_cube
-                        )
+                         )
+                        ) or
+                            self.y_2 + 3*self.side_cube > HEIGHT
                     ):
                         return True
         return False
@@ -753,12 +756,12 @@ class L(Figures):
                         self.check_on_cube(self.x_4, self.y_4, cube[1], Checklist_y[cube[0]])
                        ):
                         self.right_flag = True
-                    elif (
-                        self.check_on_cube(-self.x_4, self.y_4, cube[1], Checklist_y[cube[0]]) or
-                        self.check_on_cube(-(self.x_4 - self.side_cube), self.y_4, cube[1], Checklist_y[cube[0]])
-                         ):
+                    elif self.check_on_cube(-self.x_4, self.y_4, cube[1], Checklist_y[cube[0]]):
                         self.left_flag = True
-                    if self.left_flag and self.right_flag:
+                    if (
+                            (self.left_flag and self.right_flag) or
+                            self.check_on_cube(-(self.x_4 - self.side_cube), self.y_4, cube[1], Checklist_y[cube[0]])
+                    ):
                         return True
                 elif self.position == 4:
                     if (
