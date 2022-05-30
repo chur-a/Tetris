@@ -222,7 +222,7 @@ class Z(Figures):
         self.color = color
         self.x_1 = x
         self.y_1 = y
-        self.side_cube = 30
+        self.side_cube = CUBE_SIZE
         self.x_2 = x + self.side_cube
         self.y_2 = y
         self.x_3 = x + self.side_cube
@@ -245,11 +245,6 @@ class Z(Figures):
                 self.x_1 += self.side_cube
                 self.y_1 -= self.side_cube
                 self.position = 0
-                if self.right_boarder:
-                    self.x_1 += self.side_cube
-                    self.x_2 += self.side_cube
-                    self.x_3 += self.side_cube
-                    self.x_4 += self.side_cube
             elif event.key == pygame.K_SPACE and self.position == 0:
                 self.x_1 = self.x_3
                 self.y_1 = self.y_3
@@ -257,27 +252,37 @@ class Z(Figures):
                 self.y_3 = self.y_1 + self.side_cube
                 self.x_4 += self.side_cube*2
                 self.position = 1
-                if self.right_boarder:
-                    self.x_1 -= self.side_cube
-                    self.x_2 -= self.side_cube
-                    self.x_3 -= self.side_cube
-                    self.x_4 -= self.side_cube
-                    
+            self.turn_adjustment(self.right_flag, event)
+
+    def turn_adjustment(self, right_flag, event):
+        if event.key == pygame.K_SPACE:
+            if right_flag or self.x_4 + self.side_cube > self.draw_line():
+                self.x_1 -= self.side_cube
+                self.x_2 -= self.side_cube
+                self.x_3 -= self.side_cube
+                self.x_4 -= self.side_cube
+
     def turn_disable(self):
+        self.left_flag = False
+        self.right_flag = False
         for object_packed in OBJECTS:
-            Checklist_x =[object_packed.x_1,object_packed.x_2,object_packed.x_3,object_packed.x_4]
-            Checklist_y =[object_packed.y_1,object_packed.y_2,object_packed.y_3,object_packed.y_4]
+            Checklist_x =[object_packed.x_1, object_packed.x_2, object_packed.x_3, object_packed.x_4]
+            Checklist_y =[object_packed.y_1, object_packed.y_2, object_packed.y_3, object_packed.y_4]
             if self.position == 1:
                 for cube in enumerate(Checklist_x):
-                    if ((cube[1] - self.side_cube < self.x_2 < cube[1] + self.side_cube) and
-                     (Checklist_y[cube[0]] < self.y_2 - self.side_cube < Checklist_y[cube[0]] + self.side_cube)):
+                    if (Checklist_y[cube[0]] <= self.y_2 - self.side_cube < Checklist_y[cube[0]] + self.side_cube and
+                        cube[1] == self.x_2):
                         return True
             elif self.position == 0:
                 for cube in enumerate(Checklist_x):
-                    if (not self.right_boarder and self.y_4 - 4 <= Checklist_y[cube[0]] < self.y_4 + self.side_cube and
-                      cube[1] == self.x_2 + self.side_cube):
-                        return True
-                    if self.left_boarder and self.right_boarder:
+                    if self.check_on_cube(self.x_4 + self.side_cube, self.y_4, cube[1], Checklist_y[cube[0]]):
+                        self.right_flag = True
+                    elif self.check_on_cube(-self.x_3, self.y_3, cube[1], Checklist_y[cube[0]]):
+                        self.left_flag = True
+                    if (
+                        (self.left_flag and self.right_flag) or
+                        self.check_on_cube(self.x_4, self.y_4, cube[1], Checklist_y[cube[0]])
+                    ):
                         return True
         return False
         
@@ -286,7 +291,7 @@ class I(Figures):
     def __init__(self, x, y, color):
         self.x_1 = x
         self.y_1 = y
-        self.side_cube = 30
+        self.side_cube = CUBE_SIZE
         self.y_2 = self.y_1 + self.side_cube
         self.y_3 = self.y_2 + self.side_cube
         self.y_4 = self.y_3 + self.side_cube
@@ -299,39 +304,53 @@ class I(Figures):
         self.y_wait = self.draw_rect()[1] + HEIGHT_RECT//2 - 2*self.side_cube
         
     def turn_disable(self):
-        right_distance = WIDTH
-        left_distance = WIDTH
-        shell = Shell()
+        self.left_flag_sm = self.right_flag_sm = False
+        self.left_flag_bg = self.right_flag_bg = False
+        self.left_flag_lf = self.right_flag_lf = False
         for object_packed in OBJECTS:
-            Checklist_x =[object_packed.x_1,object_packed.x_2,object_packed.x_3,object_packed.x_4]
-            Checklist_y =[object_packed.y_1,object_packed.y_2,object_packed.y_3,object_packed.y_4]
+            Checklist_x =[object_packed.x_1, object_packed.x_2, object_packed.x_3, object_packed.x_4]
+            Checklist_y =[object_packed.y_1, object_packed.y_2, object_packed.y_3, object_packed.y_4]
             if self.position == 1:
-                for cube in enumerate(Checklist_y):
-                    if self.y_2 - self.side_cube <= cube[1] <= self.y_2 + self.side_cube:
-                        if self.x_2 >= Checklist_x[cube[0]] + self.side_cube and left_distance > self.x_2 - (Checklist_x[cube[0]] + self.side_cube):
-                            left_distance = self.x_2 - (Checklist_x[cube[0]] + self.side_cube)
-                        if self.x_2 + self.side_cube <= Checklist_x[cube[0]] and right_distance > Checklist_x[cube[0]] - (self.x_2 + self.side_cube):
-                            right_distance = Checklist_x[cube[0]] - (self.x_2 + self.side_cube)
+                for check_x, check_y in zip(Checklist_x, Checklist_y):
+                    if self.y_2 - self.side_cube <= check_y <= self.y_2 + self.side_cube:
+                        if self.check_on_cube(self.x_2 + self.side_cube, self.y_2, check_x, check_y):
+                            self.right_flag_bg = True
+                        elif self.check_on_cube(-(self.x_2 - self.side_cube), self.y_2, check_x, check_y):
+                            self.left_flag_bg = True
+                        elif self.check_on_cube(self.x_2, self.y_2, check_x, check_y):
+                            self.right_flag_sm = True
+                        elif self.check_on_cube(-(self.x_2 - 2*self.side_cube), self.y_2, check_x, check_y):
+                            self.left_flag_sm = True
+                        elif self.check_on_cube(-self.x_2, self.y_2, check_x, check_y):
+                            self.left_flag_lf = True
+                        elif self.check_on_cube(self.x_2 + 2*self.side_cube, self.y_2, check_x, check_y):
+                            self.right_flag_lf = True
+                        if (
+                                (self.left_flag_bg and self.right_flag_bg) or
+                                (self.left_flag_sm and self.right_flag_sm) or
+                                (self.left_flag_lf and self.right_flag_lf)
+                        ):
+                            return True
             elif self.position == 0:
-                for cube in enumerate(Checklist_x):
-                    if ((self.x_2 == cube[1] and not self.left_boarder) or (self.x_1 == cube[1] and self.left_boarder) or
-                          (self.x_4 == cube[1] and self.right_boarder)):
-                        if Checklist_y[cube[0]] <= self.y_2 - self.side_cube <= Checklist_y[cube[0]] + self.side_cube:
-                            return True
-                        if Checklist_y[cube[0]] <= self.y_2 + self.side_cube <= Checklist_y[cube[0]] + self.side_cube:
-                            return True
-                        if Checklist_y[cube[0]] <= self.y_2 + 2*self.side_cube <= Checklist_y[cube[0]] + self.side_cube:
-                            return True            
-        if self.x_2 < left_distance:
-            left_distance = self.x_2
-        if shell.draw_line() - self.x_2 + self.side_cube < right_distance:
-            right_distance = shell.draw_line() - self.x_2 + self.side_cube
-        if left_distance + right_distance <= 3*self.side_cube:
-            return True
-        else:
-            return False
+                for check_x, check_y in zip(Checklist_x, Checklist_y):
+                    if (
+                        (
+                            (self.x_2 == check_x and not self.left_boarder) or
+                            (self.x_1 == check_x and self.left_boarder) or
+                            (self.x_4 == check_x and self.right_boarder)
+                        ) and
+                        (
+                            check_y <= self.y_2 - self.side_cube <= check_y + self.side_cube
+                            or
+                            check_y <= self.y_2 + self.side_cube <= check_y + self.side_cube
+                            or
+                            check_y <= self.y_2 + 2*self.side_cube <= check_y + self.side_cube
+                        )
+                    ):
+                        return True
+        return False
     
-    def turn(self):#FIXME
+    def turn(self):
         for event in pygame.event.get(eventtype=pygame.KEYDOWN):
             if event.key == pygame.K_SPACE and self.position == 1:
                 self.y_1 = self.y_3 = self.y_4 = self.y_2
@@ -339,45 +358,45 @@ class I(Figures):
                 self.x_3 += self.side_cube
                 self.x_4 += 2*self.side_cube
                 self.position = 0
-                if self.right_boarder_1:
-                    self.x_1 -= 2*self.side_cube
-                    self.x_2 -= 2*self.side_cube
-                    self.x_3 -= 2*self.side_cube
-                    self.x_4 -= 2*self.side_cube
-                elif self.right_boarder_2:
-                    self.x_1 -= self.side_cube
-                    self.x_2 -= self.side_cube
-                    self.x_3 -= self.side_cube
-                    self.x_4 -= self.side_cube
-                elif self.left_boarder:
-                    self.x_1 += self.side_cube
-                    self.x_2 += self.side_cube
-                    self.x_3 += self.side_cube
-                    self.x_4 += self.side_cube
             elif event.key == pygame.K_SPACE and self.position == 0:
                 self.x_1 = self.x_3 = self.x_4 = self.x_2
                 self.y_1 -= self.side_cube
                 self.y_3 += self.side_cube
                 self.y_4 += 2*self.side_cube
                 self.position = 1
-                if self.right_boarder_1:
-                    self.x_1 += 2*self.side_cube
-                    self.x_2 += 2*self.side_cube
-                    self.x_3 += 2*self.side_cube
-                    self.x_4 += 2*self.side_cube
-                elif self.left_boarder:
-                    self.x_1 -= self.side_cube
-                    self.x_2 -= self.side_cube
-                    self.x_3 -= self.side_cube
-                    self.x_4 -= self.side_cube
-    
+            self.turn_adjustment(event)
+
+    def turn_adjustment(self, event):
+        if event.key == pygame.K_SPACE:
+            if (
+                    (self.right_flag_sm and not self.left_flag_sm) or
+                    self.x_4 + self.side_cube > self.draw_line()
+            ):
+                self.x_1 -= 2*self.side_cube
+                self.x_2 -= 2*self.side_cube
+                self.x_3 -= 2*self.side_cube
+                self.x_4 -= 2*self.side_cube
+            elif self.right_flag_bg and not self.left_flag_bg:
+                self.x_1 -= self.side_cube
+                self.x_2 -= self.side_cube
+                self.x_3 -= self.side_cube
+                self.x_4 -= self.side_cube
+            if (
+                    (self.left_flag_lf and not self.right_flag_lf) or
+                    self.x_1 - self.side_cube < 0
+            ):
+                self.x_1 += self.side_cube
+                self.x_2 += self.side_cube
+                self.x_3 += self.side_cube
+                self.x_4 += self.side_cube
+
 
 class J(Figures):
     def __init__(self, x, y, color):
         self.color = color
         self.x_1 = x
         self.y_1 = y
-        self.side_cube = 30
+        self.side_cube = CUBE_SIZE
         self.x_2 = self.x_1
         self.y_2 = self.y_1 + self.side_cube
         self.x_3 = self.x_2 + self.side_cube
@@ -469,9 +488,9 @@ class J(Figures):
                 self.x_4 += self.side_cube
                 self.y_4 += 2*self.side_cube
                 self.position = 1
-            self.turn_adjustments(self.right_flag, event)
+            self.turn_adjustment(self.right_flag, event)
 
-    def turn_adjustments(self, right_flag, event):
+    def turn_adjustment(self, right_flag, event):
         if event.key == pygame.K_SPACE:
             if right_flag or self.x_3 + 2*self.side_cube > self.draw_line():
                 self.x_1 -= self.side_cube
@@ -485,7 +504,7 @@ class S(Figures):
         self.color = color
         self.x_1 = x
         self.y_1 = y
-        self.side_cube = 30
+        self.side_cube = CUBE_SIZE
         self.x_2 = x - self.side_cube
         self.y_2 = y
         self.x_3 = x - self.side_cube
@@ -514,11 +533,7 @@ class S(Figures):
                 self.turn_adjustment(self.right_flag)
 
     def turn_adjustment(self, right_flag):
-        shell = Shell()
-        if (
-            right_flag or
-            self.x_1 + self.side_cube > shell.draw_line()
-        ):
+        if right_flag or self.x_1 + self.side_cube > self.draw_line():
             self.x_1 -= self.side_cube
             self.x_2 -= self.side_cube
             self.x_3 -= self.side_cube
@@ -528,8 +543,8 @@ class S(Figures):
         self.left_flag = False
         self.right_flag = False
         for object_packed in OBJECTS:
-            Checklist_x =[object_packed.x_1,object_packed.x_2,object_packed.x_3,object_packed.x_4]
-            Checklist_y =[object_packed.y_1,object_packed.y_2,object_packed.y_3,object_packed.y_4]
+            Checklist_x =[object_packed.x_1, object_packed.x_2, object_packed.x_3, object_packed.x_4]
+            Checklist_y =[object_packed.y_1, object_packed.y_2, object_packed.y_3, object_packed.y_4]
             if self.position == 1:
                 for cube in enumerate(Checklist_x):
                     if (Checklist_y[cube[0]] <= self.y_2 - self.side_cube < Checklist_y[cube[0]] + self.side_cube and
@@ -552,7 +567,7 @@ class T(Figures):
 
     def __init__(self, x, y, color):
         self.color = color
-        self.side_cube = 30
+        self.side_cube = CUBE_SIZE
         self.x_1 = x
         self.y_1 = y
         self.x_2 = x - self.side_cube
@@ -592,9 +607,9 @@ class T(Figures):
                 self.y_1 += self.side_cube
                 self.y_2 = self.y_4 = self.y_3
                 self.position = 1
-            self.turn_adjustments(self.right_flag, event)
+            self.turn_adjustment(self.right_flag, event)
 
-    def turn_adjustments(self, right_flag, event):
+    def turn_adjustment(self, right_flag, event):
         if event.key == pygame.K_SPACE:
             if right_flag or self.x_1 + 2*self.side_cube > self.draw_line():
                 self.x_1 -= self.side_cube
@@ -625,8 +640,8 @@ class T(Figures):
                         return True
                 elif self.position == 3:
                     if (
-                        self.check_on_cube(-self.x_1, self.y_1-self.side_cube,cube[1],Checklist_y[cube[0]]) or
-                        self.check_on_cube(-self.x_1, self.y_1, cube[1],Checklist_y[cube[0]])
+                        self.check_on_cube(-self.x_1, self.y_1-self.side_cube, cube[1], Checklist_y[cube[0]]) or
+                        self.check_on_cube(-self.x_1, self.y_1, cube[1], Checklist_y[cube[0]])
                     ):
                         return True
                 elif self.position == 4:
@@ -646,7 +661,7 @@ class L(Figures):
 
     def __init__(self, x, y, color):
         self.color = color
-        self.side_cube = 30
+        self.side_cube = CUBE_SIZE
         self.x_1 = x
         self.y_1 = y
         self.x_2 = x - self.side_cube
@@ -691,9 +706,9 @@ class L(Figures):
                 self.y_3 -= self.side_cube
                 self.y_4 -= 2*self.side_cube
                 self.position = 1
-            self.turn_adjustments(self.right_flag, event)
+            self.turn_adjustment(self.right_flag, event)
 
-    def turn_adjustments(self, right_flag, event):
+    def turn_adjustment(self, right_flag, event):
         if event.key == pygame.K_SPACE:
             if (
                 right_flag or
@@ -760,7 +775,7 @@ class O(Figures):
 
     def __init__(self, x, y, color):
         self.color = color
-        self.side_cube = 30
+        self.side_cube = CUBE_SIZE
         self.x_1 = x
         self.y_1 = y
         self.x_2 = x - self.side_cube
@@ -781,10 +796,8 @@ class GameTools:
     def __init__(self):
         self.font = FONT
         self.font.set_bold(True)
-        self.time = 0
+        self.time = self.score = 0
         self.fps = round(CLOCK.get_fps())
-        self.score = 0
-        self.pause = True
         self.black = (0, 0, 0)
         self.control_table = (self.font.render('Turn: SPACE', True, self.black),
                               self.font.render('Pause: ENTER', True, self.black),
@@ -820,7 +833,7 @@ class GameTools:
         return False
 
     def game_stop(self, table):
-        while self.pause:
+        while True:
             CLOCK.tick(20)
             raw_height = table[0].get_height()
             raw_width = table[0].get_width()
@@ -845,6 +858,7 @@ X_LINE, Y_LINE = (680, 0)
 LEFT_RECT, TOP_RECT = (700, 200)
 WIDTH_RECT, HEIGHT_RECT = (240, 130)
 RECT_BORDER_RADIUS = 4
+CUBE_SIZE = 30
 RUN_GAME = True
 CLOCK = pygame.time.Clock()
 OBJECTS = []
