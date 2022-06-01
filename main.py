@@ -161,7 +161,7 @@ class Figures(Shell):
                 self.raw_equalization(rawlist[0][1])
                 self.raw_rect(rawlist[0][1])
                 self.raw_eliminate(rawlist)
-                self.raw_show()
+                Game.raw_show()
                 Game.score += 10
 
     def raw_equalization(self, mark):
@@ -208,13 +208,6 @@ class Figures(Shell):
     def raw_rect(self, mark):
         pygame.draw.rect(SCREEN, (0, 0, 0), (10, mark, 660, self.side_cube))
 
-    def raw_show(self):
-        self.draw_line()
-        self.draw_rect()
-        objec_wait.wait()
-        Game.blit_table((740, 800), Game.score_table)
-        pygame.display.update()
-        pygame.time.wait(2000)
 
 
 class Z(Figures):
@@ -794,7 +787,7 @@ class O(Figures):
         return True
 
 
-class GameTools:
+class GameTools(Shell):
 
     def __init__(self):
         self.font = FONT
@@ -808,6 +801,9 @@ class GameTools:
         self.paused_table = (self.font.render('GAME IS PAUSED', True, self.black),
                              self.font.render('Press ENTER to unpause', True, self.black),
                              self.font.render('Press ESC to exit', True, self.black))
+        self.sounds = {'BackgroundMusic': pygame.mixer.Sound("assets/Sounds/Tetris_theme.mp3"),
+                       'RawMusic': pygame.mixer.Sound("assets/Sounds/raw.mp3"),
+                       'GameStop': pygame.mixer.Sound("assets/Sounds/Game_over.mp3")}
 
     @property
     def score_table(self):
@@ -851,6 +847,17 @@ class GameTools:
                 elif event.key == pygame.K_RETURN:
                     return False
 
+    def raw_show(self):
+        self.draw_line()
+        self.draw_rect()
+        objec_wait.wait()
+        self.blit_table((740, 800), self.score_table)
+        self.sounds['BackgroundMusic'].set_volume(0.5)
+        self.sounds['RawMusic'].play()
+        pygame.display.update()
+        pygame.time.wait(2000)
+        self.sounds['BackgroundMusic'].set_volume(1)
+
 
 pygame.init()
 
@@ -869,6 +876,8 @@ FONT = pygame.font.Font("assets/Font/tahoma.ttf", 24)
 
 
 Game = GameTools()
+Game.sounds['BackgroundMusic'].play(loops=-1)
+pygame.display.set_caption('Tetris')
 
 objec = I(310, -4, (40, 25, 77))
 objec_wait = Z(310, -4, (174, 122, 14))
@@ -916,9 +925,13 @@ while RUN_GAME:
         object_check_go = OBJECTS[-1]
         if Game.game_over_check([object_check_go.y_1, object_check_go.y_2, object_check_go.y_3, object_check_go.y_4]):
             SCREEN.fill((255, 255, 255))
+            pygame.mixer.stop()
+            Game.sounds['GameStop'].play(loops=-1)
             if Game.game_stop(Game.game_over_table):
                 RUN_GAME = False
             else:
+                Game.sounds['GameStop'].stop()
+                Game.sounds['BackgroundMusic'].play(loops=-1)
                 OBJECTS.clear()
                 Game.score = Game.time = 0
     except IndexError:
