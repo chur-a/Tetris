@@ -106,19 +106,19 @@ class Figures(Shell):
         for object_packed in OBJECTS:
             Checklist_x = [object_packed.x_1, object_packed.x_2, object_packed.x_3, object_packed.x_4]
             Checklist_y = [object_packed.y_1, object_packed.y_2, object_packed.y_3, object_packed.y_4]
-            for cube in enumerate(Checklist_x):
+            for check_x, check_y in zip(Checklist_x, Checklist_y):
                 if (
-                        self.check_on_cube(self.x_2, self.y_2, cube[1], Checklist_y[cube[0]]) or
-                        self.check_on_cube(self.x_1, self.y_1, cube[1], Checklist_y[cube[0]]) or
-                        self.check_on_cube(self.x_3, self.y_3, cube[1], Checklist_y[cube[0]]) or
-                        self.check_on_cube(self.x_4, self.y_4, cube[1], Checklist_y[cube[0]])
+                        self.check_on_cube(self.x_2, self.y_2, check_x, check_y) or
+                        self.check_on_cube(self.x_1, self.y_1, check_x, check_y) or
+                        self.check_on_cube(self.x_3, self.y_3, check_x, check_y) or
+                        self.check_on_cube(self.x_4, self.y_4, check_x, check_y)
                 ):
                     self.right_boarder = True
                 if (
-                        self.check_on_cube(-self.x_2, self.y_2, cube[1], Checklist_y[cube[0]]) or
-                        self.check_on_cube(-self.x_1, self.y_1, cube[1], Checklist_y[cube[0]]) or
-                        self.check_on_cube(-self.x_3, self.y_3, cube[1], Checklist_y[cube[0]]) or
-                        self.check_on_cube(-self.x_4, self.y_4, cube[1], Checklist_y[cube[0]])
+                        self.check_on_cube(-self.x_2, self.y_2, check_x, check_y) or
+                        self.check_on_cube(-self.x_1, self.y_1, check_x, check_y) or
+                        self.check_on_cube(-self.x_3, self.y_3, check_x, check_y) or
+                        self.check_on_cube(-self.x_4, self.y_4, check_x, check_y)
                 ):
                     self.left_boarder = True
 
@@ -209,7 +209,6 @@ class Figures(Shell):
         pygame.draw.rect(SCREEN, (0, 0, 0), (10, mark, 660, self.side_cube))
 
 
-
 class Z(Figures):
     def __init__(self, x, y, color):
         self.color = color
@@ -259,22 +258,21 @@ class Z(Figures):
         self.left_flag = False
         self.right_flag = False
         for object_packed in OBJECTS:
-            Checklist_x =[object_packed.x_1, object_packed.x_2, object_packed.x_3, object_packed.x_4]
-            Checklist_y =[object_packed.y_1, object_packed.y_2, object_packed.y_3, object_packed.y_4]
+            Checklist_x = [object_packed.x_1, object_packed.x_2, object_packed.x_3, object_packed.x_4]
+            Checklist_y = [object_packed.y_1, object_packed.y_2, object_packed.y_3, object_packed.y_4]
             if self.position == 1:
-                for cube in enumerate(Checklist_x):
-                    if (Checklist_y[cube[0]] <= self.y_2 - self.side_cube < Checklist_y[cube[0]] + self.side_cube and
-                        cube[1] == self.x_2):
+                for check_x, check_y in zip(Checklist_x, Checklist_y):
+                    if check_y <= self.y_2 - self.side_cube < check_y + self.side_cube and check_x == self.x_2:
                         return True
             elif self.position == 0:
-                for cube in enumerate(Checklist_x):
-                    if self.check_on_cube(self.x_4 + self.side_cube, self.y_4, cube[1], Checklist_y[cube[0]]):
+                for check_x, check_y in zip(Checklist_x, Checklist_y):
+                    if self.check_on_cube(self.x_4 + self.side_cube, self.y_4, check_x, check_y):
                         self.right_flag = True
-                    elif self.check_on_cube(-self.x_3, self.y_3, cube[1], Checklist_y[cube[0]]):
+                    elif self.check_on_cube(-self.x_3, self.y_3, check_x, check_y):
                         self.left_flag = True
                     if (
                         (self.left_flag and self.right_flag) or
-                        self.check_on_cube(self.x_4, self.y_4, cube[1], Checklist_y[cube[0]])
+                        self.check_on_cube(self.x_4, self.y_4, check_x, check_y)
                     ):
                         return True
         return False
@@ -301,8 +299,8 @@ class I(Figures):
         self.left_flag_bg = self.right_flag_bg = False
         self.left_flag_lf = self.right_flag_lf = False
         for object_packed in OBJECTS:
-            Checklist_x =[object_packed.x_1, object_packed.x_2, object_packed.x_3, object_packed.x_4]
-            Checklist_y =[object_packed.y_1, object_packed.y_2, object_packed.y_3, object_packed.y_4]
+            Checklist_x = [object_packed.x_1, object_packed.x_2, object_packed.x_3, object_packed.x_4]
+            Checklist_y = [object_packed.y_1, object_packed.y_2, object_packed.y_3, object_packed.y_4]
             if self.position == 1:
                 for check_x, check_y in zip(Checklist_x, Checklist_y):
                     if self.y_2 - self.side_cube <= check_y <= self.y_2 + self.side_cube:
@@ -409,45 +407,45 @@ class J(Figures):
         for object_packed in OBJECTS:
             Checklist_x =[object_packed.x_1, object_packed.x_2, object_packed.x_3, object_packed.x_4]
             Checklist_y =[object_packed.y_1, object_packed.y_2, object_packed.y_3, object_packed.y_4]
-            for cube in enumerate(Checklist_x):
+            for check_x, check_y in zip(Checklist_x, Checklist_y):
                 if self.position == 1:
                     if (
-                        self.check_on_cube(self.x_1, self.y_1, cube[1], Checklist_y[cube[0]]) or
-                        self.check_on_cube(self.x_1, self.y_1 - self.side_cube, cube[1], Checklist_y[cube[0]]) or
-                        self.check_on_cube(self.x_3, self.y_3 - 2*self.side_cube, cube[1], Checklist_y[cube[0]])
+                        self.check_on_cube(self.x_1, self.y_1, check_x, check_y) or
+                        self.check_on_cube(self.x_1, self.y_1 - self.side_cube, check_x, check_y) or
+                        self.check_on_cube(self.x_3, self.y_3 - 2*self.side_cube, check_x, check_y)
                     ):
                         return True
                 elif self.position == 2:
                     if (
-                        self.check_on_cube(self.x_3 + self.side_cube, self.y_3, cube[1], Checklist_y[cube[0]]) or
-                        self.check_on_cube(self.x_4 + self.side_cube, self.y_4, cube[1], Checklist_y[cube[0]])
+                        self.check_on_cube(self.x_3 + self.side_cube, self.y_3, check_x, check_y) or
+                        self.check_on_cube(self.x_4 + self.side_cube, self.y_4, check_x, check_y)
                     ):
                         self.right_flag = True
-                    elif self.check_on_cube(-self.x_3, self.y_3, cube[1], Checklist_y[cube[0]]):
+                    elif self.check_on_cube(-self.x_3, self.y_3, check_x, check_y):
                         self.left_flag = True
                     if (
                         (self.right_flag and self.left_flag) or
-                        self.check_on_cube(self.x_3, self.y_3, cube[1], Checklist_y[cube[0]])
+                        self.check_on_cube(self.x_3, self.y_3, check_x, check_y)
                     ):
                         return True
                 elif self.position == 3:
                     if (
-                        self.check_on_cube(-self.x_1, self.y_1, cube[1], Checklist_y[cube[0]]) or
-                        self.check_on_cube(-(self.x_1 - self.side_cube), self.y_1, cube[1], Checklist_y[cube[0]]) or
-                        self.check_on_cube(-self.x_2, self.y_2 - self.side_cube, cube[1], Checklist_y[cube[0]])
+                        self.check_on_cube(-self.x_1, self.y_1, check_x, check_y) or
+                        self.check_on_cube(-(self.x_1 - self.side_cube), self.y_1, check_x, check_y) or
+                        self.check_on_cube(-self.x_2, self.y_2 - self.side_cube, check_x, check_y)
                     ):
                         return True
                 elif self.position == 4:
-                    if self.check_on_cube(self.x_2, self.y_2, cube[1], Checklist_y[cube[0]]):
+                    if self.check_on_cube(self.x_2, self.y_2, check_x, check_y):
                         self.right_flag = True
                     elif (
-                          self.check_on_cube(-self.x_1, self.y_1, cube[1], Checklist_y[cube[0]]) or
-                          self.check_on_cube(-self.x_1, self.y_1 - self.side_cube, cube[1], Checklist_y[cube[0]])
+                          self.check_on_cube(-self.x_1, self.y_1, check_x, check_y) or
+                          self.check_on_cube(-self.x_1, self.y_1 - self.side_cube, check_x, check_y)
                     ):
                         self.left_flag = True
                     if (
                         (self.left_flag and self.right_flag) or
-                        self.check_on_cube(-self.x_3, self.y_3, cube[1], Checklist_y[cube[0]])
+                        self.check_on_cube(-self.x_3, self.y_3, check_x, check_y)
                     ):
                         return True
         return False
@@ -542,17 +540,19 @@ class S(Figures):
             Checklist_x =[object_packed.x_1, object_packed.x_2, object_packed.x_3, object_packed.x_4]
             Checklist_y =[object_packed.y_1, object_packed.y_2, object_packed.y_3, object_packed.y_4]
             if self.position == 1:
-                for cube in enumerate(Checklist_x):
-                    if (Checklist_y[cube[0]] <= self.y_2 - self.side_cube < Checklist_y[cube[0]] + self.side_cube and
-                        cube[1] == self.x_2 - self.side_cube):
+                for check_x, check_y in zip(Checklist_x, Checklist_y):
+                    if (
+                            check_y <= self.y_2 - self.side_cube < check_y + self.side_cube and
+                            check_x == self.x_2 - self.side_cube
+                    ):
                          return True
             elif self.position == 0:
-                for cube in enumerate(Checklist_x):
-                    if self.check_on_cube(-self.x_4, self.y_4, cube[1], Checklist_y[cube[0]]):
+                for check_x, check_y in zip(Checklist_x, Checklist_y):
+                    if self.check_on_cube(-self.x_4, self.y_4, check_x, check_y):
                         return True
-                    if self.check_on_cube(self.x_3, self.y_3, cube[1], Checklist_y[cube[0]]):
+                    if self.check_on_cube(self.x_3, self.y_3, check_x, check_y):
                         self.right_flag = True
-                    elif self.check_on_cube(-(self.x_4 - self.side_cube), self.y_4, cube[1], Checklist_y[cube[0]]):
+                    elif self.check_on_cube(-(self.x_4 - self.side_cube), self.y_4, check_x, check_y):
                         self.left_flag = True
                     if self.left_flag and self.right_flag:
                         return True
@@ -619,34 +619,33 @@ class T(Figures):
         for object_packed in OBJECTS:
             Checklist_x = [object_packed.x_1, object_packed.x_2, object_packed.x_3, object_packed.x_4]
             Checklist_y = [object_packed.y_1, object_packed.y_2, object_packed.y_3, object_packed.y_4]
-            for cube in enumerate(Checklist_x):
+            for check_x, check_y in zip(Checklist_x, Checklist_y):
                 if self.position == 1:
-                    if (Checklist_y[cube[0]] <= self.y_3 - self.side_cube < Checklist_y[cube[0]] + self.side_cube and
-                    cube[1] == self.x_3):
+                    if check_y <= self.y_3 - self.side_cube < check_y + self.side_cube and check_x == self.x_3:
                         return True
                 elif self.position == 2:
-                    if self.check_on_cube(self.x_4, self.y_4, cube[1], Checklist_y[cube[0]]):
+                    if self.check_on_cube(self.x_4, self.y_4, check_x, check_y):
                         self.right_flag = True
-                    elif self.check_on_cube(-(self.x_4-self.side_cube), self.y_4, cube[1], Checklist_y[cube[0]]):
+                    elif self.check_on_cube(-(self.x_4-self.side_cube), self.y_4, check_x, check_y):
                         self.left_flag = True
                     if (
                         (self.left_flag and self.right_flag) or
-                        self.check_on_cube(-self.x_4, self.y_4, cube[1], Checklist_y[cube[0]])
+                        self.check_on_cube(-self.x_4, self.y_4, check_x, check_y)
                     ):
                         return True
                 elif self.position == 3:
                     if (
-                        self.check_on_cube(-self.x_1, self.y_1-self.side_cube, cube[1], Checklist_y[cube[0]]) or
-                        self.check_on_cube(-self.x_1, self.y_1, cube[1], Checklist_y[cube[0]])
+                        self.check_on_cube(-self.x_1, self.y_1-self.side_cube, check_x, check_y) or
+                        self.check_on_cube(-self.x_1, self.y_1, check_x, check_y)
                     ):
                         return True
                 elif self.position == 4:
                     if (
-                        self.check_on_cube(self.x_1, self.y_1, cube[1], Checklist_y[cube[0]]) or
-                        self.check_on_cube(self.x_2, self.y_2, cube[1], Checklist_y[cube[0]])
+                        self.check_on_cube(self.x_1, self.y_1, check_x, check_y) or
+                        self.check_on_cube(self.x_2, self.y_2, check_x, check_y)
                     ):
                         self.right_flag = True
-                    elif self.check_on_cube(-self.x_3, self.y_3, cube[1], Checklist_y[cube[0]]):
+                    elif self.check_on_cube(-self.x_3, self.y_3, check_x, check_y):
                         self.left_cube = True
                     if self.right_flag and self.left_flag:
                         return True
@@ -722,46 +721,42 @@ class L(Figures):
         for object_packed in OBJECTS:
             Checklist_x = [object_packed.x_1, object_packed.x_2, object_packed.x_3, object_packed.x_4]
             Checklist_y = [object_packed.y_1, object_packed.y_2, object_packed.y_3, object_packed.y_4]
-            for cube in enumerate(Checklist_x):
+            for check_x, check_y in zip(Checklist_x, Checklist_y):
                 if self.position == 1:
-                    if self.check_on_cube(self.x_3, self.y_3, cube[1], Checklist_y[cube[0]]):
+                    if self.check_on_cube(self.x_3, self.y_3, check_x, check_x):
                         return True
-                    if self.check_on_cube(self.x_1, self.y_1 - self.side_cube, cube[1], Checklist_y[cube[0]]):
+                    if self.check_on_cube(self.x_1, self.y_1 - self.side_cube, check_x, check_x):
                         self.right_flag = True
                     elif (
-                        self.check_on_cube(-self.x_3, self.y_3, cube[1], Checklist_y[cube[0]]) and
-                        self.check_on_cube(-self.x_2, self.y_2, cube[1], Checklist_y[cube[0]])
+                        self.check_on_cube(-self.x_3, self.y_3, check_x, check_y) and
+                        self.check_on_cube(-self.x_2, self.y_2, check_x, check_y)
                     ):
                         self.left_flag = True
                     if self.left_flag and self.right_flag:
                         return True
                 elif self.position == 2:
                     if (
-                       (Checklist_y[cube[0]] <= self.y_2 - self.side_cube < Checklist_y[cube[0]] + self.side_cube and
-                        cube[1] == self.x_2) or
-                       (Checklist_y[cube[0]] <= self.y_3 - self.side_cube < Checklist_y[cube[0]] + self.side_cube and
-                        cube[1] == self.x_3)
+                        (check_y <= self.y_2 - self.side_cube < check_y + self.side_cube and check_x == self.x_2) or
+                        (check_y <= self.y_3 - self.side_cube < check_y + self.side_cube and check_x == self.x_3)
                        ):
                         return True
                 elif self.position == 3:
                     if (
-                        self.check_on_cube(self.x_3, self.y_3, cube[1], Checklist_y[cube[0]]) or
-                        self.check_on_cube(self.x_4, self.y_4, cube[1], Checklist_y[cube[0]])
+                        self.check_on_cube(self.x_3, self.y_3, check_x, check_y) or
+                        self.check_on_cube(self.x_4, self.y_4, check_x, check_y)
                        ):
                         self.right_flag = True
-                    elif self.check_on_cube(-self.x_4, self.y_4, cube[1], Checklist_y[cube[0]]):
+                    elif self.check_on_cube(-self.x_4, self.y_4, check_x, check_y):
                         self.left_flag = True
                     if (
                             (self.left_flag and self.right_flag) or
-                            self.check_on_cube(-(self.x_4 - self.side_cube), self.y_4, cube[1], Checklist_y[cube[0]])
+                            self.check_on_cube(-(self.x_4 - self.side_cube), self.y_4, check_x, check_y)
                     ):
                         return True
                 elif self.position == 4:
                     if (
-                       (Checklist_y[cube[0]] <= self.y_4 - self.side_cube < Checklist_y[cube[0]] + self.side_cube and
-                        cube[1] == self.x_4) or
-                       (Checklist_y[cube[0]] <= self.y_4 - 2*self.side_cube < Checklist_y[cube[0]] + self.side_cube and
-                        cube[1] == self.x_4)
+                       (check_y <= self.y_4 - self.side_cube < check_y + self.side_cube and check_x == self.x_4) or
+                       (check_y <= self.y_4 - 2*self.side_cube < check_y + self.side_cube and check_x == self.x_4)
                        ):
                         return True
         return False
@@ -803,7 +798,7 @@ class GameTools(Shell):
                              self.font.render('Press ESC to exit', True, self.black))
         self.sounds = {'BackgroundMusic': pygame.mixer.Sound("assets/Sounds/Tetris_theme.mp3"),
                        'RawMusic': pygame.mixer.Sound("assets/Sounds/raw.mp3"),
-                       'GameStop': pygame.mixer.Sound("assets/Sounds/Game_over.mp3")}
+                       'GameOver': pygame.mixer.Sound("assets/Sounds/Game_over.mp3")}
 
     @property
     def score_table(self):
@@ -825,6 +820,12 @@ class GameTools(Shell):
             height_line = line_surface.get_height()
             y += height_line
 
+    def game_update(self):
+        self.time += CLOCK.tick(20)
+        self.fps = round(CLOCK.get_fps())
+        self.blit_table((740, 800), self.score_table)
+        self.blit_table((740, 500), self.control_table)
+
     def game_over_check(self, checklist):
         for y in checklist:
             if y < 0:
@@ -842,10 +843,18 @@ class GameTools(Shell):
                 y += line.get_height()
             pygame.display.update()
             for event in pygame.event.get(eventtype=(pygame.KEYUP, pygame.QUIT)):
-                if event.type == pygame.QUIT or event.key == pygame.K_ESCAPE:
+                if self.event_handler(event):
                     return True
-                elif event.key == pygame.K_RETURN:
+                else:
                     return False
+
+    def event_handler(self, event):
+        if event.type == pygame.QUIT or event.key == pygame.K_ESCAPE:
+            return True
+        elif event.key == pygame.K_RETURN:
+            return False
+        else:
+            return 'Pass'
 
     def raw_show(self):
         self.draw_line()
@@ -857,6 +866,20 @@ class GameTools(Shell):
         pygame.display.update()
         pygame.time.wait(2000)
         self.sounds['BackgroundMusic'].set_volume(1)
+
+    def game_over(self):
+        SCREEN.fill((255, 255, 255))
+        pygame.mixer.stop()
+        self.sounds['GameOver'].play(loops=-1)
+        if self.game_stop(self.game_over_table):
+            return True
+        else:
+            return False
+
+    def game_restart(self):
+        self.sounds['GameOver'].stop()
+        self.sounds['BackgroundMusic'].play(loops=-1)
+        self.score = self.time = 0
 
 
 pygame.init()
@@ -876,6 +899,7 @@ FONT = pygame.font.Font("assets/Font/tahoma.ttf", 24)
 
 
 Game = GameTools()
+
 Game.sounds['BackgroundMusic'].play(loops=-1)
 pygame.display.set_caption('Tetris')
 
@@ -885,11 +909,7 @@ objec_wait = Z(310, -4, (174, 122, 14))
 
 while RUN_GAME:
     SCREEN.fill((255, 255, 255))
-
-    Game.time += CLOCK.tick(20)
-    Game.fps = round(CLOCK.get_fps())
-    Game.blit_table((740, 800), Game.score_table)
-    Game.blit_table((740, 500), Game.control_table)
+    Game.game_update()
     pygame.event.pump()
 
     if not objec.stop():
@@ -913,9 +933,11 @@ while RUN_GAME:
         objec_packed.show()
 
     for event in pygame.event.get(eventtype=(pygame.KEYUP, pygame.QUIT)):
-        if event.type == pygame.QUIT or event.key == pygame.K_ESCAPE:
+        print(Game.event_handler(event))
+        if Game.event_handler(event) and Game.event_handler(event) != 'Pass':
+            print('HERE')
             RUN_GAME = False
-        elif event.key == pygame.K_RETURN:
+        elif not Game.event_handler(event):
             if Game.game_stop(Game.paused_table):
                 RUN_GAME = False
 
@@ -924,16 +946,11 @@ while RUN_GAME:
     try:
         object_check_go = OBJECTS[-1]
         if Game.game_over_check([object_check_go.y_1, object_check_go.y_2, object_check_go.y_3, object_check_go.y_4]):
-            SCREEN.fill((255, 255, 255))
-            pygame.mixer.stop()
-            Game.sounds['GameStop'].play(loops=-1)
-            if Game.game_stop(Game.game_over_table):
+            if Game.game_over():
                 RUN_GAME = False
             else:
-                Game.sounds['GameStop'].stop()
-                Game.sounds['BackgroundMusic'].play(loops=-1)
+                Game.game_restart()
                 OBJECTS.clear()
-                Game.score = Game.time = 0
     except IndexError:
         pass
 
