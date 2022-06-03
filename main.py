@@ -935,7 +935,6 @@ while RUN_GAME:
     for event in pygame.event.get(eventtype=(pygame.KEYUP, pygame.QUIT)):
         print(Game.event_handler(event))
         if Game.event_handler(event) and Game.event_handler(event) != 'Pass':
-            print('HERE')
             RUN_GAME = False
         elif not Game.event_handler(event):
             if Game.game_stop(Game.paused_table):
