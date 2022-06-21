@@ -1,20 +1,9 @@
 import random
 import pygame
+from game_tools import GameTools
 
 
-class Shell:
-
-    def draw_line(self):
-        pygame.draw.line(SCREEN, (0, 0, 255), (X_LINE, Y_LINE), (X_LINE, Y_LINE + HEIGHT), 5)
-        return X_LINE
-
-    def draw_rect(self):
-        pygame.draw.rect(SCREEN, (255, 0, 255), (LEFT_RECT, TOP_RECT, WIDTH_RECT, HEIGHT_RECT),
-                         width=5, border_radius=RECT_BORDER_RADIUS)
-        return LEFT_RECT, TOP_RECT
-
-
-class Figures(Shell):
+class Figures:
     def show(self):
         pygame.draw.rect(SCREEN, self.color,
                          (self.x_1, self.y_1, self.side_cube, self.side_cube))
@@ -50,7 +39,7 @@ class Figures(Shell):
             self.x_4 -= self.side_cube
 
     def wait(self):
-        object_w = self.__class__(self.x_wait, self.y_wait,(self.color))
+        object_w = self.__class__(self.x_wait, self.y_wait, self.color)
         object_w.show()
 
     def stop(self):
@@ -125,10 +114,9 @@ class Figures(Shell):
     def check_collision_borders(self):
         for x in [self.x_1, self.x_2, self.x_3, self.x_4]:
             if x <= self.side_cube:
-                self.draw_line()
                 self.left_boarder = True
                 break
-            elif x + self.side_cube >= self.draw_line() - self.side_cube:
+            elif x + self.side_cube >= X_LINE - self.side_cube:
                 self.right_boarder = True
                 break
 
@@ -161,7 +149,7 @@ class Figures(Shell):
                 self.raw_equalization(rawlist[0][1])
                 self.raw_rect(rawlist[0][1])
                 self.raw_eliminate(rawlist)
-                Game.raw_show()
+                self.raw_show()
                 Game.score += 10
 
     def raw_equalization(self, mark):
@@ -208,6 +196,15 @@ class Figures(Shell):
     def raw_rect(self, mark):
         pygame.draw.rect(SCREEN, (0, 0, 0), (10, mark, 660, self.side_cube))
 
+    def raw_show(self):
+        objec_wait.wait()
+        Game.game_update()
+        Game.sounds['BackgroundMusic'].set_volume(0.5)
+        Game.sounds['RawMusic'].play()
+        pygame.display.update()
+        pygame.time.wait(2000)
+        Game.sounds['BackgroundMusic'].set_volume(1)
+
 
 class Z(Figures):
     def __init__(self, x, y, color):
@@ -224,8 +221,8 @@ class Z(Figures):
         self.position = 1
         self.left_boarder = False
         self.right_boarder = False
-        self.x_wait = self.draw_rect()[0] + WIDTH_RECT//2 - 1.5*self.side_cube
-        self.y_wait = self.draw_rect()[1] + HEIGHT_RECT//2 - self.side_cube
+        self.x_wait = LEFT_RECT + WIDTH_RECT//2 - 1.5*self.side_cube
+        self.y_wait = TOP_RECT + HEIGHT_RECT//2 - self.side_cube
 
     def turn(self):
         for event in pygame.event.get(eventtype=pygame.KEYDOWN):
@@ -248,7 +245,7 @@ class Z(Figures):
 
     def turn_adjustment(self, right_flag, event):
         if event.key == pygame.K_SPACE:
-            if right_flag or self.x_4 + self.side_cube > self.draw_line():
+            if right_flag or self.x_4 + self.side_cube > X_LINE:
                 self.x_1 -= self.side_cube
                 self.x_2 -= self.side_cube
                 self.x_3 -= self.side_cube
@@ -291,8 +288,8 @@ class I(Figures):
         self.color = color
         self.left_boarder = False
         self.right_boarder = False
-        self.x_wait = self.draw_rect()[0] + WIDTH_RECT//2 - self.side_cube//2
-        self.y_wait = self.draw_rect()[1] + HEIGHT_RECT//2 - 2*self.side_cube
+        self.x_wait = LEFT_RECT + WIDTH_RECT//2 - self.side_cube//2
+        self.y_wait = TOP_RECT + HEIGHT_RECT//2 - 2*self.side_cube
         
     def turn_disable(self):
         self.left_flag_sm = self.right_flag_sm = False
@@ -364,7 +361,7 @@ class I(Figures):
         if event.key == pygame.K_SPACE:
             if (
                     (self.right_flag_sm and not self.left_flag_sm) or
-                    self.x_4 + self.side_cube > self.draw_line()
+                    self.x_4 + self.side_cube > X_LINE
             ):
                 self.x_1 -= 2*self.side_cube
                 self.x_2 -= 2*self.side_cube
@@ -398,8 +395,8 @@ class J(Figures):
         self.x_4 = self.x_3 + self.side_cube
         self.y_4 = self.y_3
         self.position = 1
-        self.x_wait = self.draw_rect()[0] + WIDTH_RECT//2 - 3*self.side_cube//2
-        self.y_wait = self.draw_rect()[1] + HEIGHT_RECT//2 - self.side_cube
+        self.x_wait = LEFT_RECT + WIDTH_RECT//2 - 3*self.side_cube//2
+        self.y_wait = TOP_RECT + HEIGHT_RECT//2 - self.side_cube
             
     def turn_disable(self):
         self.left_flag = False
@@ -486,7 +483,7 @@ class J(Figures):
 
     def turn_adjustment(self, right_flag, event):
         if event.key == pygame.K_SPACE:
-            if right_flag or self.x_3 + 2*self.side_cube > self.draw_line():
+            if right_flag or self.x_3 + 2*self.side_cube > X_LINE:
                 self.x_1 -= self.side_cube
                 self.x_2 -= self.side_cube
                 self.x_3 -= self.side_cube
@@ -506,8 +503,8 @@ class S(Figures):
         self.x_4 = x - 2*self.side_cube
         self.y_4 = y + self.side_cube
         self.position = 1
-        self.x_wait = self.draw_rect()[0] + WIDTH_RECT // 2 + self.side_cube // 2
-        self.y_wait = self.draw_rect()[1] + HEIGHT_RECT // 2 - self.side_cube
+        self.x_wait = LEFT_RECT + WIDTH_RECT // 2 + self.side_cube // 2
+        self.y_wait = TOP_RECT + HEIGHT_RECT // 2 - self.side_cube
             
     def turn(self):
         for event in pygame.event.get(eventtype=pygame.KEYDOWN):
@@ -527,7 +524,7 @@ class S(Figures):
                 self.turn_adjustment(self.right_flag)
 
     def turn_adjustment(self, right_flag):
-        if right_flag or self.x_1 + self.side_cube > self.draw_line():
+        if right_flag or self.x_1 + self.side_cube > X_LINE:
             self.x_1 -= self.side_cube
             self.x_2 -= self.side_cube
             self.x_3 -= self.side_cube
@@ -573,8 +570,8 @@ class T(Figures):
         self.x_4 = x + self.side_cube
         self.y_4 = y - self.side_cube
         self.position = 1
-        self.x_wait = self.draw_rect()[0] + WIDTH_RECT // 2 - self.side_cube // 2
-        self.y_wait = self.draw_rect()[1] + HEIGHT_RECT // 2
+        self.x_wait = LEFT_RECT + WIDTH_RECT // 2 - self.side_cube // 2
+        self.y_wait = TOP_RECT + HEIGHT_RECT // 2
 
     def turn(self):
         for event in pygame.event.get(eventtype=pygame.KEYDOWN):
@@ -607,7 +604,7 @@ class T(Figures):
 
     def turn_adjustment(self, right_flag, event):
         if event.key == pygame.K_SPACE:
-            if right_flag or self.x_1 + 2*self.side_cube > self.draw_line():
+            if right_flag or self.x_1 + 2*self.side_cube > X_LINE:
                 self.x_1 -= self.side_cube
                 self.x_2 -= self.side_cube
                 self.x_3 -= self.side_cube
@@ -666,8 +663,8 @@ class L(Figures):
         self.x_4 = x - self.side_cube
         self.y_4 = y - 2*self.side_cube
         self.position = 1
-        self.x_wait = self.draw_rect()[0] + WIDTH_RECT // 2
-        self.y_wait = self.draw_rect()[1] + HEIGHT_RECT // 2 + self.side_cube // 2
+        self.x_wait = LEFT_RECT + WIDTH_RECT // 2
+        self.y_wait = TOP_RECT + HEIGHT_RECT // 2 + self.side_cube // 2
 
     def turn(self):
         for event in pygame.event.get(eventtype=pygame.KEYDOWN):
@@ -707,8 +704,8 @@ class L(Figures):
         if event.key == pygame.K_SPACE:
             if (
                 right_flag or
-                self.x_1 + 2*self.side_cube > self.draw_line() or
-                self.x_4 + 2*self.side_cube > self.draw_line()
+                self.x_1 + 2*self.side_cube > X_LINE or
+                self.x_4 + 2*self.side_cube > X_LINE
             ):
                 self.x_1 -= self.side_cube
                 self.x_2 -= self.side_cube
@@ -775,111 +772,11 @@ class O(Figures):
         self.y_3 = y - self.side_cube
         self.x_4 = x
         self.y_4 = y - self.side_cube
-        self.x_wait = self.draw_rect()[0] + WIDTH_RECT // 2
-        self.y_wait = self.draw_rect()[1] + HEIGHT_RECT // 2
+        self.x_wait = LEFT_RECT + WIDTH_RECT // 2
+        self.y_wait = TOP_RECT + HEIGHT_RECT // 2
 
     def turn_disable(self):
         return True
-
-
-class GameTools(Shell):
-
-    def __init__(self):
-        self.font = FONT
-        self.font.set_bold(True)
-        self.time = self.score = 0
-        self.fps = round(CLOCK.get_fps())
-        self.black = (0, 0, 0)
-        self.control_table = (self.font.render('Turn: SPACE', True, self.black),
-                              self.font.render('Pause: ENTER', True, self.black),
-                              self.font.render('Exit: ESC', True, self.black))
-        self.paused_table = (self.font.render('GAME IS PAUSED', True, self.black),
-                             self.font.render('Press ENTER to unpause', True, self.black),
-                             self.font.render('Press ESC to exit', True, self.black))
-        self.sounds = {'BackgroundMusic': pygame.mixer.Sound("assets/Sounds/Tetris_theme.mp3"),
-                       'RawMusic': pygame.mixer.Sound("assets/Sounds/raw.mp3"),
-                       'GameOver': pygame.mixer.Sound("assets/Sounds/Game_over.mp3")}
-
-    @property
-    def score_table(self):
-        return (self.font.render('Time: {}'.format(self.time // 1000), True, self.black),
-                self.font.render('FPS: {}'.format(self.fps), True, self.black),
-                self.font.render('Score: {}'.format(self.score), True, self.black))
-
-    @property
-    def game_over_table(self):
-        return (self.font.render('GAME OVER', True, self.black),
-                self.font.render('Your Score: {}'.format(self.score), True, self.black),
-                self.font.render('Press ENTER to start a new game', True, self.black),
-                self.font.render('Press ESC to exit', True, self.black))
-
-    def blit_table(self, pos: tuple, table):
-        x, y = pos
-        for line_surface in table:
-            SCREEN.blit(line_surface, (x, y))
-            height_line = line_surface.get_height()
-            y += height_line
-
-    def game_update(self):
-        self.time += CLOCK.tick(20)
-        self.fps = round(CLOCK.get_fps())
-        self.blit_table((740, 800), self.score_table)
-        self.blit_table((740, 500), self.control_table)
-
-    def game_over_check(self, checklist):
-        for y in checklist:
-            if y < 0:
-                return True
-        return False
-
-    def game_stop(self, table):
-        while True:
-            CLOCK.tick(20)
-            raw_height = table[0].get_height()
-            raw_width = table[0].get_width()
-            x, y = (WIDTH // 2 - raw_width // 2 - 50, HEIGHT // 2 - raw_height)
-            for line in table:
-                SCREEN.blit(line, (x, y))
-                y += line.get_height()
-            pygame.display.update()
-            for event in pygame.event.get(eventtype=(pygame.KEYUP, pygame.QUIT)):
-                if self.event_handler(event):
-                    return True
-                else:
-                    return False
-
-    def event_handler(self, event):
-        if event.type == pygame.QUIT or event.key == pygame.K_ESCAPE:
-            return True
-        elif event.key == pygame.K_RETURN:
-            return False
-        else:
-            return 'Pass'
-
-    def raw_show(self):
-        self.draw_line()
-        self.draw_rect()
-        objec_wait.wait()
-        self.blit_table((740, 800), self.score_table)
-        self.sounds['BackgroundMusic'].set_volume(0.5)
-        self.sounds['RawMusic'].play()
-        pygame.display.update()
-        pygame.time.wait(2000)
-        self.sounds['BackgroundMusic'].set_volume(1)
-
-    def game_over(self):
-        SCREEN.fill((255, 255, 255))
-        pygame.mixer.stop()
-        self.sounds['GameOver'].play(loops=-1)
-        if self.game_stop(self.game_over_table):
-            return True
-        else:
-            return False
-
-    def game_restart(self):
-        self.sounds['GameOver'].stop()
-        self.sounds['BackgroundMusic'].play(loops=-1)
-        self.score = self.time = 0
 
 
 pygame.init()
@@ -890,7 +787,6 @@ SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
 X_LINE, Y_LINE = (680, 0)
 LEFT_RECT, TOP_RECT = (700, 200)
 WIDTH_RECT, HEIGHT_RECT = (240, 130)
-RECT_BORDER_RADIUS = 4
 CUBE_SIZE = 30
 RUN_GAME = True
 CLOCK = pygame.time.Clock()
@@ -898,7 +794,7 @@ OBJECTS = []
 FONT = pygame.font.Font("assets/Font/tahoma.ttf", 24)
 
 
-Game = GameTools()
+Game = GameTools(FONT, CLOCK, WIDTH, HEIGHT, SCREEN, (X_LINE, Y_LINE), (LEFT_RECT, TOP_RECT, WIDTH_RECT, HEIGHT_RECT))
 
 Game.sounds['BackgroundMusic'].play(loops=-1)
 pygame.display.set_caption('Tetris')
@@ -933,10 +829,9 @@ while RUN_GAME:
         objec_packed.show()
 
     for event in pygame.event.get(eventtype=(pygame.KEYUP, pygame.QUIT)):
-        print(Game.event_handler(event))
-        if Game.event_handler(event) and Game.event_handler(event) != 'Pass':
+        if Game.event_handler(event) == 'QUIT':
             RUN_GAME = False
-        elif not Game.event_handler(event):
+        elif Game.event_handler(event) == 'RETURN':
             if Game.game_stop(Game.paused_table):
                 RUN_GAME = False
 
