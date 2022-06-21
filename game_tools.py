@@ -14,12 +14,15 @@ class GameTools:
         self.time = self.score = 0
         self.fps = round(clock.get_fps())
         self.black = (0, 0, 0)
+        self.green = (124, 252, 0)
+        self.yellow = (255, 255, 0)
         self.control_table = (self.font.render('Turn: SPACE', True, self.black),
                               self.font.render('Pause: ENTER', True, self.black),
                               self.font.render('Exit: ESC', True, self.black))
-        self.paused_table = (self.font.render('GAME IS PAUSED', True, self.black),
-                             self.font.render('Press ENTER to unpause', True, self.black),
-                             self.font.render('Press ESC to exit', True, self.black))
+        self.paused_table = (self.font.render('GAME ON PAUSE', True, self.black),
+                             self.font.render('RESUME', True, self.black),
+                             self.font.render('SETTINGS', True, self.black),
+                             self.font.render('EXIT', True, self.black))
         self.sounds = {'BackgroundMusic': pygame.mixer.Sound("assets/Sounds/Tetris_theme.mp3"),
                        'RawMusic': pygame.mixer.Sound("assets/Sounds/raw.mp3"),
                        'GameOver': pygame.mixer.Sound("assets/Sounds/Game_over.mp3")}
@@ -32,10 +35,10 @@ class GameTools:
 
     @property
     def game_over_table(self):
-        return (self.font.render('GAME OVER', True, self.black),
-                self.font.render('Your Score: {}'.format(self.score), True, self.black),
-                self.font.render('Press ENTER to start a new game', True, self.black),
-                self.font.render('Press ESC to exit', True, self.black))
+        return (self.font.render(f'GAME OVER, YOUR SCORE: {self.score}', True, self.black),
+                self.font.render('NEW GAME', True, self.black),
+                self.font.render('SETTINGS', True, self.black),
+                self.font.render('EXIT', True, self.black))
 
     def draw_lines(self):
         pygame.draw.line(self.screen, (0, 0, 255), (self.x_line, self.y_line),
@@ -64,15 +67,23 @@ class GameTools:
                 return True
         return False
 
+    def draw_menu(self, table):
+        x_menu, y_menu = self.width//2 - 150, 200
+        title = table[0]
+        table = table[1:]
+        self.screen.blit(title, (x_menu + 150 - title.get_width()//2, y_menu - 60))
+        for button in table:
+            pygame.draw.rect(self.screen, self.yellow, (x_menu - 15, y_menu - 15, 330, 130))
+            pygame.draw.rect(self.screen, self.green, (x_menu, y_menu, 300, 100))
+            x_text, y_text = x_menu + 150 - button.get_width()//2, y_menu + 50 - button.get_height()//2
+            self.screen.blit(button, (x_text, y_text))
+            y_menu += 150
+
     def game_stop(self, table):
         while True:
             self.clock.tick(20)
-            raw_height = table[0].get_height()
-            raw_width = table[0].get_width()
-            x, y = (self.width // 2 - raw_width // 2 - 50, self.height // 2 - raw_height)
-            for line in table:
-                self.screen.blit(line, (x, y))
-                y += line.get_height()
+            self.screen.fill((255, 255, 255))
+            self.draw_menu(table)
             pygame.display.update()
             for event in pygame.event.get(eventtype=(pygame.KEYUP, pygame.QUIT)):
                 if self.event_handler(event) == 'QUIT':
@@ -86,9 +97,7 @@ class GameTools:
         elif event.key == pygame.K_RETURN:
             return 'RETURN'
 
-
     def game_over(self):
-        self.screen.fill((255, 255, 255))
         pygame.mixer.stop()
         self.sounds['GameOver'].play(loops=-1)
         if self.game_stop(self.game_over_table):
