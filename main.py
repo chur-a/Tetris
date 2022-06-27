@@ -828,12 +828,12 @@ while RUN_GAME:
     for objec_packed in OBJECTS:
         objec_packed.show()
 
-    for event in pygame.event.get(eventtype=(pygame.KEYUP, pygame.QUIT)):
-        if Game.event_handler(event) == 'QUIT':
+    if Game.event_status == 'QUIT':
+        RUN_GAME = False
+    elif Game.event_status == 'RETURN':
+        Game.game_stop(Game.paused_table)
+        if Game.event_status == 'QUIT':
             RUN_GAME = False
-        elif Game.event_handler(event) == 'RETURN':
-            if Game.game_stop(Game.paused_table):
-                RUN_GAME = False
 
     pygame.display.update()
 
